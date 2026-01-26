@@ -44,6 +44,11 @@
   "homepage": "https://github.com/softaworks/agenttrail#readme",
   "author": "Softaworks",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public",
+    "provenance": true
+  },
   "engines": {
     "bun": ">=1.0.0"
   },
