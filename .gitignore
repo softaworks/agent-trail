@@ -3,6 +3,8 @@ node_modules/
 
 # Build output
 dist/
+coverage/
+lcov.info
 
 # OS files
 .DS_Store
