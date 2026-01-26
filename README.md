@@ -31,6 +31,18 @@ bun install
 
 ## Usage
 
+### Quickstart (no install)
+
+```bash
+# Bun
+bunx agenttrail
+
+# npm (still requires Bun installed on your machine)
+npx -y agenttrail
+```
+
+### Run from source
+
 Start the server:
 
 ```bash
@@ -145,6 +157,20 @@ Contributions are welcome!
 
 - Please read `CONTRIBUTING.md`.
 - Run `bun run typecheck` and `bun run check` before opening a PR.
+
+## Publishing
+
+This repository is set up to publish to npm via GitHub Actions using the same pattern as `datadog-cli`:
+
+- `.github/workflows/release-please.yml` opens a release PR (version bump + changelog) using conventional commits.
+- When a release is created (or via manual dispatch), it publishes to npm.
+
+To enable publishing:
+
+1. Create the package on npm (name: `agenttrail`).
+2. Configure npm auth for GitHub Actions:
+   - Option A: npm **Trusted Publishing** (OIDC) for this repo, or
+   - Option B: set a repo secret `NPM_TOKEN` (classic automation token).
 
 ## Security
 
