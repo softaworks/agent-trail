@@ -78,6 +78,8 @@ body {
   color: rgb(var(--foreground));
   line-height: 1.6;
   font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 code,
@@ -231,21 +233,60 @@ pre {
 .markdown-content {
   color: rgb(var(--foreground));
   font-size: 0.95rem;
+  line-height: 1.65;
 }
 
 .markdown-content p {
-  margin: 0.5rem 0;
+  margin: 0.6rem 0;
 }
 
 .markdown-content ul,
 .markdown-content ol {
-  margin: 0.5rem 0 0.5rem 1.25rem;
+  margin: 0.6rem 0 0.6rem 1.25rem;
+}
+
+.markdown-content li + li {
+  margin-top: 0.25rem;
 }
 
 .markdown-content a {
   color: rgb(var(--primary));
   text-decoration: underline;
 }
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  font-family: var(--font-display);
+  color: rgb(var(--foreground));
+  line-height: 1.25;
+  margin: 1rem 0 0.5rem;
+}
+
+.markdown-content h1 {
+  font-size: 1.6rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.35rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.15rem;
+}
+
+.markdown-content h4 {
+  font-size: 1rem;
+}
+
+.markdown-content blockquote {
+  margin: 0.75rem 0;
+  padding-left: 0.9rem;
+  border-left: 3px solid rgb(var(--border));
+  color: rgb(var(--muted-foreground));
+}
+
 
 .markdown-content code {
   background: rgb(var(--card) / 0.6);
