@@ -23,8 +23,24 @@ test.describe('Search and Filters', () => {
 
   test('filters by time - Today', async ({ page }) => {
     await page.goto('/');
-    const todayFilter = page.locator('#time-filters .filter-item[data-filter="today"]');
+    const todayFilter = page.locator('.filter-btn[data-filter="today"]');
     await todayFilter.click();
     await expect(todayFilter).toHaveClass(/active/);
+  });
+
+  test('displays filter counts', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.session-card');
+
+    const allCount = page.locator('#count-all');
+    const todayCount = page.locator('#count-today');
+    const weekCount = page.locator('#count-week');
+
+    await expect(allCount).toBeVisible();
+    await expect(todayCount).toBeVisible();
+    await expect(weekCount).toBeVisible();
+
+    const allText = await allCount.textContent();
+    expect(Number(allText)).toBeGreaterThanOrEqual(0);
   });
 });

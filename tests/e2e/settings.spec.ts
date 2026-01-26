@@ -40,6 +40,7 @@ test.describe('Settings Modal', () => {
     await page.goto('/');
     await page.locator('#settings-btn').click();
 
+    await page.locator('#add-directory-btn').scrollIntoViewIfNeeded();
     await page.locator('#add-directory-btn').click();
     await page.fill('#new-dir-path', 'tests/e2e/fixtures/sessions-extra');
     await page.fill('#new-dir-label', 'Extra');

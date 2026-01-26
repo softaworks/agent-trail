@@ -92,6 +92,48 @@ async function loadConfig() {
   }
 }
 
+// Date Grouping
+function groupSessionsByDate(sessions) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+  const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+  const groups = {
+    today: [],
+    yesterday: [],
+    thisWeek: [],
+    older: []
+  };
+
+  sessions.forEach(session => {
+    const sessionDate = new Date(session.lastModified);
+    const sessionDay = new Date(sessionDate.getFullYear(), sessionDate.getMonth(), sessionDate.getDate());
+
+    if (sessionDay.getTime() === today.getTime()) {
+      groups.today.push(session);
+    } else if (sessionDay.getTime() === yesterday.getTime()) {
+      groups.yesterday.push(session);
+    } else if (sessionDate >= weekAgo) {
+      groups.thisWeek.push(session);
+    } else {
+      groups.older.push(session);
+    }
+  });
+
+  return groups;
+}
+
+function getDateGroupLabel(groupKey) {
+  const labels = {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    thisWeek: 'This Week',
+    older: 'Older'
+  };
+  return labels[groupKey] || groupKey;
+}
+
 // Rendering
 function renderSessionList() {
   const container = document.getElementById('session-list');
@@ -108,7 +150,23 @@ function renderSessionList() {
     return;
   }
 
-  container.innerHTML = filtered.map(session => renderSessionCard(session)).join('');
+  const groups = groupSessionsByDate(filtered);
+  const groupOrder = ['today', 'yesterday', 'thisWeek', 'older'];
+
+  let html = '';
+  groupOrder.forEach(groupKey => {
+    const sessions = groups[groupKey];
+    if (sessions.length === 0) return;
+
+    html += `
+      <div class="date-group" data-group="${groupKey}">
+        <div class="date-divider">${getDateGroupLabel(groupKey)}</div>
+        ${sessions.map(session => renderSessionCard(session)).join('')}
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
 }
 
 function renderSessionCard(session) {
@@ -116,25 +174,66 @@ function renderSessionCard(session) {
   const awaitingClass = session.status === 'awaiting' ? 'awaiting' : '';
   const pinBadge = session.isPinned ? '<span class="pin-badge">&#x1F4CC;</span>' : '';
 
+  // Generate preview from first message content
+  const preview = getSessionPreview(session);
+
   return `
     <div class="session-card ${pinnedClass} ${awaitingClass}" data-id="${session.id}" onclick="showSession('${session.id}')">
-      <div class="session-title">${escapeHtml(session.title)}${pinBadge}</div>
+      <div class="session-card-header">
+        <div class="session-title">${escapeHtml(session.title)}${pinBadge}</div>
+        <div class="session-project">
+          <span class="project-icon">&#x1F4C1;</span>
+          ${escapeHtml(session.projectName)}
+        </div>
+      </div>
+      ${preview ? `<div class="session-preview">${escapeHtml(preview)}</div>` : ''}
       <div class="session-meta">
         <span class="session-directory" style="background: ${session.directoryColor}20; color: ${session.directoryColor}">
           <span class="directory-color" style="background: ${session.directoryColor}"></span>
           ${escapeHtml(session.directoryLabel)}
         </span>
         <span class="session-dot"></span>
-        <span>${escapeHtml(session.projectName)}</span>
-        <span class="session-dot"></span>
         <span>${formatRelativeTime(session.lastModified)}</span>
         ${renderStatusIndicator(session.status)}
       </div>
-      <div class="session-tags">
-        ${session.tags.map(tag => `<span class="tag tag-${tag}">${tag}</span>`).join('')}
-      </div>
+      ${session.tags.length > 0 ? `
+        <div class="session-tags">
+          ${session.tags.map(tag => `<span class="tag tag-${tag}">${tag}</span>`).join('')}
+        </div>
+      ` : ''}
     </div>
   `;
+}
+
+function getSessionPreview(session) {
+  // Try to get preview from session's first user message
+  if (session.preview) {
+    return truncateText(session.preview, 120);
+  }
+  // Fallback: if we have messages loaded, get first user message
+  if (session.messages && session.messages.length > 0) {
+    const firstUserMsg = session.messages.find(m => m.type === 'user');
+    if (firstUserMsg && firstUserMsg.content) {
+      const text = extractTextContent(firstUserMsg.content);
+      return truncateText(text, 120);
+    }
+  }
+  return '';
+}
+
+function extractTextContent(content) {
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return '';
+
+  const textBlock = content.find(block => block.type === 'text');
+  return textBlock ? textBlock.text : '';
+}
+
+function truncateText(text, maxLength) {
+  if (!text) return '';
+  const cleaned = text.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= maxLength) return cleaned;
+  return cleaned.slice(0, maxLength).trim() + '...';
 }
 
 function renderStatusIndicator(status) {
@@ -151,6 +250,7 @@ function renderStatusIndicator(status) {
 
 function renderDirectoryList() {
   const container = document.getElementById('directory-list');
+  if (!container) return;
   container.innerHTML = state.directories.map(dir => `
     <div class="directory-item ${state.filters.directory === dir.path ? 'active' : ''}"
          data-path="${escapeHtml(dir.path)}" onclick="filterByDirectory('${escapeHtml(dir.path)}')">
@@ -163,6 +263,7 @@ function renderDirectoryList() {
 
 function renderProjectList() {
   const container = document.getElementById('project-list');
+  if (!container) return;
   container.innerHTML = state.projects.map(project => `
     <div class="project-item ${state.filters.project === project.path ? 'active' : ''}"
          onclick="filterByProject('${escapeHtml(project.path)}')">
@@ -175,6 +276,7 @@ function renderProjectList() {
 
 function renderTagList() {
   const container = document.getElementById('tag-list');
+  if (!container) return;
   container.innerHTML = Object.entries(state.tags)
     .sort((a, b) => b[1] - a[1])
     .map(([tag, count]) => `
@@ -216,20 +318,44 @@ function updateFilterCounts() {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-  document.getElementById('count-all').textContent = state.sessions.length;
-  document.getElementById('count-today').textContent = state.sessions.filter(s =>
-    new Date(s.lastModified) >= today
-  ).length;
-  document.getElementById('count-week').textContent = state.sessions.filter(s =>
-    new Date(s.lastModified) >= weekAgo
-  ).length;
+  const countAll = state.sessions.length;
+  const countToday = state.sessions.filter(s => new Date(s.lastModified) >= today).length;
+  const countWeek = state.sessions.filter(s => new Date(s.lastModified) >= weekAgo).length;
+
+  // Update sidebar counts (if present)
+  const countAllEl = document.getElementById('count-all');
+  const countTodayEl = document.getElementById('count-today');
+  const countWeekEl = document.getElementById('count-week');
+
+  if (countAllEl) countAllEl.textContent = countAll;
+  if (countTodayEl) countTodayEl.textContent = countToday;
+  if (countWeekEl) countWeekEl.textContent = countWeek;
+
+  // Update header filter button counts (new design)
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    const filter = btn.dataset.filter;
+    const countSpan = btn.querySelector('.filter-count');
+    if (!countSpan) return;
+
+    if (filter === 'all') countSpan.textContent = countAll;
+    else if (filter === 'today') countSpan.textContent = countToday;
+    else if (filter === 'week') countSpan.textContent = countWeek;
+  });
 }
 
 function filterByTime(filter) {
   state.filters.time = filter;
+
+  // Update sidebar filters (if present)
   document.querySelectorAll('#time-filters .filter-item').forEach(el => {
     el.classList.toggle('active', el.dataset.filter === filter);
   });
+
+  // Update header filter buttons (new design)
+  document.querySelectorAll('.filter-btn').forEach(el => {
+    el.classList.toggle('active', el.dataset.filter === filter);
+  });
+
   if (state.currentSession) returnToList();
   renderSessionList();
 }
@@ -959,24 +1085,72 @@ function showNotification(message, type = 'info') {
 function setupEventListeners() {
   window.addEventListener('popstate', handleRoute);
 
+  // Header scroll shadow effect
+  const header = document.querySelector('.header');
+  const main = document.querySelector('.main');
+  if (header && main) {
+    main.addEventListener('scroll', () => {
+      if (main.scrollTop > 10) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+  }
+
+  // Sidebar time filters (legacy/fallback)
   document.querySelectorAll('#time-filters .filter-item').forEach(el => {
     el.addEventListener('click', () => filterByTime(el.dataset.filter));
   });
 
-  const searchInput = document.getElementById('search-input');
-  let searchTimeout;
-  searchInput.addEventListener('input', e => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => performSearch(e.target.value), 300);
+  // Header filter buttons (new design)
+  document.querySelectorAll('.filter-btn').forEach(el => {
+    el.addEventListener('click', () => filterByTime(el.dataset.filter));
   });
 
-  document.getElementById('search-mode-btn').addEventListener('click', toggleSearchMode);
-  document.getElementById('back-button').addEventListener('click', showList);
-  document.getElementById('pin-button').addEventListener('click', togglePin);
-  document.getElementById('settings-btn').addEventListener('click', openSettings);
-  document.getElementById('modal-close').addEventListener('click', closeSettings);
-  document.getElementById('modal-backdrop').addEventListener('click', closeSettings);
-  document.getElementById('add-directory-btn').addEventListener('click', showAddDirectoryForm);
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    let searchTimeout;
+    searchInput.addEventListener('input', e => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => performSearch(e.target.value), 300);
+    });
+  }
+
+  const searchModeBtn = document.getElementById('search-mode-btn');
+  if (searchModeBtn) {
+    searchModeBtn.addEventListener('click', toggleSearchMode);
+  }
+
+  const backButton = document.getElementById('back-button');
+  if (backButton) {
+    backButton.addEventListener('click', showList);
+  }
+
+  const pinButton = document.getElementById('pin-button');
+  if (pinButton) {
+    pinButton.addEventListener('click', togglePin);
+  }
+
+  const settingsBtn = document.getElementById('settings-btn');
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', openSettings);
+  }
+
+  const modalClose = document.getElementById('modal-close');
+  if (modalClose) {
+    modalClose.addEventListener('click', closeSettings);
+  }
+
+  const modalBackdrop = document.getElementById('modal-backdrop');
+  if (modalBackdrop) {
+    modalBackdrop.addEventListener('click', closeSettings);
+  }
+
+  const addDirectoryBtn = document.getElementById('add-directory-btn');
+  if (addDirectoryBtn) {
+    addDirectoryBtn.addEventListener('click', showAddDirectoryForm);
+  }
 }
 
 // Utilities
