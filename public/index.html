@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentTrail</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'at-bg': {
+              primary: '#0d1117',
+              secondary: '#161b22',
+              tertiary: '#21262d',
+              card: '#1c2128',
+            },
+            'at-border': '#30363d',
+            'at-text': {
+              primary: '#e6edf3',
+              secondary: '#8b949e',
+              muted: '#6e7681',
+            },
+            'at-accent': {
+              DEFAULT: '#10b981',
+              soft: 'rgba(16, 185, 129, 0.15)',
+            },
+            'at-user': {
+              DEFAULT: '#2563eb',
+              soft: 'rgba(37, 99, 235, 0.12)',
+            },
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/styles.css">
+  <!-- Syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/rust.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
+  <!-- Markdown parser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="header">
+        <div class="logo">
+          <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100" height="100" rx="16" fill="var(--bg-tertiary)"/>
+            <g transform="translate(50, 50)">
+              <!-- Trail path -->
+              <path d="M -30 15 Q -15 -5, 0 5 Q 15 15, 30 -5"
+                    fill="none" stroke="var(--accent)" stroke-width="6" stroke-linecap="round"/>
+              <!-- Dots on trail -->
+              <circle cx="-30" cy="15" r="6" fill="var(--accent)"/>
+              <circle cx="0" cy="5" r="5" fill="var(--accent-soft)">
+                <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+              </circle>
+              <circle cx="30" cy="-5" r="4" fill="var(--success)"/>
+            </g>
+          </svg>
+          AgentTrail
+        </div>
+        <button class="settings-btn" id="settings-btn" title="Settings">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18">
+            <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Time</div>
+        <ul class="filter-list" id="time-filters">
+          <li class="filter-item active" data-filter="all">
+            <div class="filter-radio"></div>
+            All Sessions
+            <span class="filter-count" id="count-all">0</span>
+          </li>
+          <li class="filter-item" data-filter="today">
+            <div class="filter-radio"></div>
+            Today
+            <span class="filter-count" id="count-today">0</span>
+          </li>
+          <li class="filter-item" data-filter="week">
+            <div class="filter-radio"></div>
+            This Week
+            <span class="filter-count" id="count-week">0</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Tags</div>
+        <div class="tag-list" id="tag-list">
+          <!-- Tags populated by JS -->
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Directories</div>
+        <div id="directory-list">
+          <!-- Directories populated by JS -->
+        </div>
+      </div>
+
+      <div class="sidebar-section" style="flex: 1; overflow-y: auto;">
+        <div class="sidebar-title">Projects</div>
+        <div id="project-list">
+          <!-- Projects populated by JS -->
+        </div>
+      </div>
+
+      <div class="sidebar-footer">
+        <span class="version">AgentTrail v1.0.0</span>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <!-- List View -->
+      <div class="list-view" id="list-view">
+        <div class="header">
+          <div class="search-box">
+            <div class="search-wrapper">
+              <span class="search-icon">&#x1F50D;</span>
+              <input type="text" class="search-input" id="search-input" placeholder="Search sessions...">
+              <button class="search-mode-btn" id="search-mode-btn" title="Toggle deep search">
+                <span id="search-mode-label">Quick</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="session-list" id="session-list">
+          <div class="loading">
+            <div class="loading-spinner"></div>
+            Loading sessions...
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail View -->
+      <div class="detail-view" id="detail-view">
+        <div class="detail-header">
+          <button class="back-button" id="back-button">
+            &#x2190; Back to sessions
+          </button>
+          <div class="detail-title-row">
+            <div class="detail-title" id="detail-title"></div>
+            <button class="pin-button" id="pin-button" title="Pin session">
+              <span class="pin-icon">&#x1F4CC;</span>
+            </button>
+          </div>
+          <div class="detail-meta" id="detail-meta"></div>
+        </div>
+
+        <div id="detail-banner"></div>
+
+        <div class="messages" id="messages">
+          <!-- Messages populated by JS -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Settings</h2>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="settings-section">
+          <h3>Directories</h3>
+          <div id="settings-directories">
+            <!-- Directory list populated by JS -->
+          </div>
+          <button class="btn btn-secondary" id="add-directory-btn">
+            + Add Directory
+          </button>
+        </div>
+        <div class="settings-section">
+          <h3>General</h3>
+          <div class="setting-row">
+            <label>Config file</label>
+            <code id="config-path"></code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

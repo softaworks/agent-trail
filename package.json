@@ -1,0 +1,54 @@
+{
+  "name": "agenttrail",
+  "version": "1.0.0",
+  "description": "Multi-directory Claude Code session viewer with configurable directories and enhanced features",
+  "type": "module",
+  "bin": {
+    "agenttrail": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "public"
+  ],
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun --format esm && mv dist/index.js dist/cli.js && chmod +x dist/cli.js",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "check": "biome check .",
+    "lint": "biome lint --write",
+    "format": "biome format --write ."
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "conversation",
+    "history",
+    "viewer",
+    "session",
+    "multi-directory"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/softaworks/agenttrail.git"
+  },
+  "bugs": {
+    "url": "https://github.com/softaworks/agenttrail/issues"
+  },
+  "homepage": "https://github.com/softaworks/agenttrail#readme",
+  "author": "Softaworks",
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/static": "^1.4.7",
+    "elysia": "^1.4.22"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.11",
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
+  }
+}
