@@ -194,10 +194,10 @@ function renderSessionList() {
 
   if (filtered.length === 0) {
     container.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">&#x1F4AC;</div>
-        <div class="empty-state-title">No sessions found</div>
-        <div class="empty-state-text">Try adjusting your filters</div>
+      <div class="empty-state flex flex-col items-center justify-center rounded-2xl border border-border bg-card/60 px-6 py-12 text-center">
+        <div class="empty-state-icon text-4xl">&#x1F4AC;</div>
+        <div class="empty-state-title mt-4 text-lg font-semibold text-foreground">No sessions found</div>
+        <div class="empty-state-text text-sm text-muted-foreground">Try adjusting your filters</div>
       </div>
     `;
     return;
@@ -225,8 +225,8 @@ function renderSessionList() {
 
 function renderSection(title, sessions) {
   return `
-    <div class="session-section">
-      <div class="section-title">${title}</div>
+    <div class="session-section space-y-3">
+      <div class="section-title text-xs font-semibold uppercase tracking-wide text-muted-foreground">${title}</div>
       ${sessions.map(session => renderSessionCard(session)).join('')}
     </div>
   `;
@@ -236,10 +236,10 @@ function renderGroupedSessions(sessions) {
   if (state.groupBy === 'project') {
     const groups = groupSessionsByProject(sessions);
     return groups.map(group => `
-      <div class="date-group" data-group="${escapeHtml(group.key)}">
-        <div class="group-header">
+      <div class="date-group space-y-3" data-group="${escapeHtml(group.key)}">
+        <div class="group-header flex items-center gap-2 text-sm font-semibold text-muted-foreground">
           <span>${escapeHtml(group.label)}</span>
-          <span class="group-count">${group.sessions.length}</span>
+          <span class="group-count ml-auto rounded-full border border-border bg-background/70 px-2 py-0.5 text-xs">${group.sessions.length}</span>
         </div>
         ${group.sessions.map(session => renderSessionCard(session)).join('')}
       </div>
@@ -249,11 +249,11 @@ function renderGroupedSessions(sessions) {
   if (state.groupBy === 'directory') {
     const groups = groupSessionsByDirectory(sessions);
     return groups.map(group => `
-      <div class="date-group" data-group="${escapeHtml(group.key)}">
-        <div class="group-header">
-          <span class="group-badge" style="background: ${group.color}"></span>
+      <div class="date-group space-y-3" data-group="${escapeHtml(group.key)}">
+        <div class="group-header flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+          <span class="group-badge h-2.5 w-2.5 rounded-full" style="background: ${group.color}"></span>
           <span>${escapeHtml(group.label)}</span>
-          <span class="group-count">${group.sessions.length}</span>
+          <span class="group-count ml-auto rounded-full border border-border bg-background/70 px-2 py-0.5 text-xs">${group.sessions.length}</span>
         </div>
         ${group.sessions.map(session => renderSessionCard(session)).join('')}
       </div>
@@ -267,8 +267,8 @@ function renderGroupedSessions(sessions) {
     const groupSessions = groups[groupKey];
     if (groupSessions.length === 0) return '';
     return `
-      <div class="date-group" data-group="${groupKey}">
-        <div class="date-divider">${getDateGroupLabel(groupKey)}</div>
+      <div class="date-group space-y-3" data-group="${groupKey}">
+        <div class="date-divider text-xs font-semibold uppercase tracking-wide text-muted-foreground">${getDateGroupLabel(groupKey)}</div>
         ${groupSessions.map(session => renderSessionCard(session)).join('')}
       </div>
     `;
@@ -284,27 +284,27 @@ function renderSessionCard(session) {
   const preview = getSessionPreview(session);
 
   return `
-    <div class="session-card ${pinnedClass} ${awaitingClass}" data-id="${session.id}" onclick="showSession('${session.id}')">
-      <div class="session-card-header">
-        <div class="session-title">${escapeHtml(session.title)}${pinBadge}</div>
-        <div class="session-project meta-link" data-filter-type="project" data-filter-value="${escapeHtml(session.project)}">
+    <div class="session-card ${pinnedClass} ${awaitingClass} cursor-pointer rounded-2xl border border-border bg-card/60 p-4 transition hover:border-primary/40 hover:bg-card/80" data-id="${session.id}" onclick="showSession('${session.id}')">
+      <div class="session-card-header flex items-start justify-between gap-4">
+        <div class="session-title text-base font-semibold text-foreground">${escapeHtml(session.title)}${pinBadge}</div>
+        <div class="session-project meta-link inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter-type="project" data-filter-value="${escapeHtml(session.project)}">
           <span class="project-icon">&#x1F4C1;</span>
           ${escapeHtml(session.projectName)}
         </div>
       </div>
-      ${preview ? `<div class="session-preview">${escapeHtml(preview)}</div>` : ''}
-      <div class="session-meta">
-        <span class="session-directory meta-link" data-filter-type="directory" data-filter-value="${escapeHtml(session.directory)}" style="background: ${session.directoryColor}20; color: ${session.directoryColor}">
-          <span class="directory-color" style="background: ${session.directoryColor}"></span>
+      ${preview ? `<div class="session-preview mt-2 text-sm text-muted-foreground">${escapeHtml(preview)}</div>` : ''}
+      <div class="session-meta mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+        <span class="session-directory meta-link inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-medium" data-filter-type="directory" data-filter-value="${escapeHtml(session.directory)}" style="background: ${session.directoryColor}20; color: ${session.directoryColor}">
+          <span class="directory-color h-2 w-2 rounded-full" style="background: ${session.directoryColor}"></span>
           ${escapeHtml(session.directoryLabel)}
         </span>
-        <span class="session-dot"></span>
+        <span class="session-dot inline-block h-1 w-1 rounded-full bg-muted-foreground/60"></span>
         <span>${formatRelativeTime(session.lastModified)}</span>
         ${renderStatusIndicator(session.status)}
       </div>
       ${session.tags.length > 0 ? `
-        <div class="session-tags">
-          ${session.tags.map(tag => `<span class="tag tag-${tag}" data-filter-type="tag" data-filter-value="${escapeHtml(tag)}">${tag}</span>`).join('')}
+        <div class="session-tags mt-3 flex flex-wrap gap-2">
+          ${session.tags.map(tag => `<span class="tag tag-${tag} inline-flex items-center rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter-type="tag" data-filter-value="${escapeHtml(tag)}">${tag}</span>`).join('')}
         </div>
       ` : ''}
     </div>
@@ -346,9 +346,9 @@ function renderStatusIndicator(status) {
   if (status === 'idle') return '';
   const labels = { awaiting: 'Needs input', working: 'Working...' };
   return `
-    <span class="session-dot"></span>
-    <span class="live-indicator ${status}">
-      <span class="live-dot"></span>
+    <span class="session-dot inline-block h-1 w-1 rounded-full bg-muted-foreground/60"></span>
+    <span class="live-indicator ${status} inline-flex items-center gap-1 rounded-full border border-border/70 bg-background/70 px-2 py-0.5 text-[11px] font-medium">
+      <span class="live-dot h-1.5 w-1.5 rounded-full"></span>
       ${labels[status]}
     </span>
   `;
@@ -358,11 +358,11 @@ function renderDirectoryList() {
   const container = document.getElementById('directory-list');
   if (!container) return;
   container.innerHTML = state.directories.map(dir => `
-    <div class="directory-item ${state.filters.directory === dir.path ? 'active' : ''}"
+    <div class="directory-item ${state.filters.directory === dir.path ? 'active' : ''} inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
          data-path="${escapeHtml(dir.path)}" onclick="filterByDirectory('${escapeHtml(dir.path)}')">
-      <span class="directory-color" style="background: ${dir.color}"></span>
+      <span class="directory-color h-2 w-2 rounded-full" style="background: ${dir.color}"></span>
       <span class="directory-label">${escapeHtml(dir.label)}</span>
-      <span class="filter-count">${dir.count}</span>
+      <span class="filter-count rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground">${dir.count}</span>
     </div>
   `).join('');
 }
@@ -379,11 +379,11 @@ function renderProjectList() {
     : state.projects.slice().sort((a, b) => b.count - a.count).slice(0, 12);
 
   container.innerHTML = list.map(project => `
-    <div class="project-item ${state.filters.project === project.path ? 'active' : ''}"
+    <div class="project-item ${state.filters.project === project.path ? 'active' : ''} inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
          onclick="filterByProject('${escapeHtml(project.path)}')">
       <span class="project-icon">&#x1F4C1;</span>
       <span class="project-name">${escapeHtml(project.name)}</span>
-      <span class="filter-count">${project.count}</span>
+      <span class="filter-count rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground">${project.count}</span>
     </div>
   `).join('');
 }
@@ -394,7 +394,7 @@ function renderTagList() {
   container.innerHTML = Object.entries(state.tags)
     .sort((a, b) => b[1] - a[1])
     .map(([tag, count]) => `
-      <span class="tag tag-${tag} ${state.filters.tag === tag ? 'active' : ''}"
+      <span class="tag tag-${tag} ${state.filters.tag === tag ? 'active' : ''} inline-flex items-center rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
             onclick="filterByTag('${tag}')">${tag} (${count})</span>
     `).join('');
 }
@@ -568,10 +568,20 @@ function renderMessages(messages) {
       const contentHtml = renderMessageContent(msg.content);
       if (!contentHtml.trim()) return '';
 
+      const wrapperClass = [
+        'message',
+        `message-${msg.type}`,
+        'rounded-2xl',
+        'border',
+        'p-4',
+        'space-y-3',
+        isUser ? 'border-accent/40 bg-accent/10' : 'border-border bg-card/60'
+      ].join(' ');
+
       return `
-        <div class="message message-${msg.type}">
-          <div class="message-label">${label}</div>
-          <div class="message-content">${contentHtml}</div>
+        <div class="${wrapperClass}">
+          <div class="message-label text-xs font-semibold uppercase tracking-wide text-muted-foreground">${label}</div>
+          <div class="message-content space-y-3">${contentHtml}</div>
         </div>
       `;
     })
@@ -596,22 +606,22 @@ function hasDisplayableContent(content) {
 
 function renderMessageContent(content) {
   if (!Array.isArray(content)) {
-    return `<div class="message-text">${escapeHtml(String(content))}</div>`;
+    return `<div class="message-text text-sm leading-relaxed text-foreground">${escapeHtml(String(content))}</div>`;
   }
 
   return content.map(block => {
     switch (block.type) {
       case 'text':
         if (!block.text || !block.text.trim()) return '';
-        return `<div class="message-text">${formatText(block.text)}</div>`;
+        return `<div class="message-text text-sm leading-relaxed text-foreground">${formatText(block.text)}</div>`;
       case 'tool_use':
         return renderToolUse(block);
       case 'thinking':
         if (!block.thinking || !block.thinking.trim()) return '';
         return `
-          <div class="thinking-block" onclick="this.classList.toggle('expanded')">
-            <div class="thinking-header">&#x1F4AD; View thinking</div>
-            <div class="thinking-content">${escapeHtml(block.thinking)}</div>
+          <div class="thinking-block rounded-2xl border border-border bg-background/60 p-3 text-sm text-muted-foreground" onclick="this.classList.toggle('expanded')">
+            <div class="thinking-header flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">&#x1F4AD; View thinking</div>
+            <div class="thinking-content mt-2 whitespace-pre-wrap font-mono text-xs text-foreground">${escapeHtml(block.thinking)}</div>
           </div>
         `;
       default:
@@ -638,19 +648,19 @@ function renderToolUse(block) {
     } else if (toolName === 'Write' && block.input.content) {
       content = renderCodeBlock(block.input.content);
     } else if (toolName === 'Bash' && block.input.command) {
-      content = `<pre class="bash-content"><code>${escapeHtml(formatBashCommand(block.input.command))}</code></pre>`;
+      content = `<pre class="bash-content rounded-xl border border-border bg-background/80 p-3 text-xs text-foreground"><code>${escapeHtml(formatBashCommand(block.input.command))}</code></pre>`;
     }
   }
 
   return `
-    <div class="tool-card ${toolClass} ${content ? '' : 'collapsed'}">
-      <div class="tool-header">
-        <div class="tool-icon">${icon}</div>
+    <div class="tool-card ${toolClass} ${content ? '' : 'collapsed'} rounded-2xl border border-border bg-background/60">
+      <div class="tool-header flex items-center gap-3 border-b border-border/70 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <div class="tool-icon flex h-6 w-6 items-center justify-center rounded-full border border-border bg-card/70 text-[11px]">${icon}</div>
         <span class="tool-name">${toolName}</span>
-        <span class="tool-path">${escapeHtml(path)}</span>
-        ${content ? '<span class="tool-toggle">&#x25BC;</span>' : ''}
+        <span class="tool-path truncate text-[11px] normal-case text-muted-foreground">${escapeHtml(path)}</span>
+        ${content ? '<span class="tool-toggle ml-auto text-[10px]">&#x25BC;</span>' : ''}
       </div>
-      ${content ? `<div class="tool-body">${content}</div>` : ''}
+      ${content ? `<div class="tool-body px-4 py-3">${content}</div>` : ''}
     </div>
   `;
 }
@@ -675,12 +685,12 @@ function renderDiff(oldStr, newStr) {
   const oldLines = oldStr.split('\n');
   const newLines = newStr.split('\n');
 
-  let html = '<div class="code-block">';
+  let html = '<div class="code-block overflow-hidden rounded-xl border border-border bg-background/80 font-mono text-xs text-foreground">';
   oldLines.forEach((line, i) => {
-    html += `<div class="code-line diff-remove"><span class="line-number">${i + 1}</span><span class="line-content">${escapeHtml(line)}</span></div>`;
+    html += `<div class="code-line diff-remove flex items-start gap-3 border-b border-border/40 px-3 py-1.5 last:border-b-0"><span class="line-number w-8 text-right text-[10px] text-muted-foreground">${i + 1}</span><span class="line-content flex-1 whitespace-pre-wrap">${escapeHtml(line)}</span></div>`;
   });
   newLines.forEach((line, i) => {
-    html += `<div class="code-line diff-add"><span class="line-number">${i + 1}</span><span class="line-content">${escapeHtml(line)}</span></div>`;
+    html += `<div class="code-line diff-add flex items-start gap-3 border-b border-border/40 px-3 py-1.5 last:border-b-0"><span class="line-number w-8 text-right text-[10px] text-muted-foreground">${i + 1}</span><span class="line-content flex-1 whitespace-pre-wrap">${escapeHtml(line)}</span></div>`;
   });
   html += '</div>';
   return html;
@@ -688,9 +698,9 @@ function renderDiff(oldStr, newStr) {
 
 function renderCodeBlock(code, language = '') {
   const lines = code.split('\n');
-  let html = '<div class="code-block">';
+  let html = '<div class="code-block overflow-hidden rounded-xl border border-border bg-background/80 font-mono text-xs text-foreground">';
   lines.forEach((line, i) => {
-    html += `<div class="code-line"><span class="line-number">${i + 1}</span><span class="line-content">${escapeHtml(line) || ' '}</span></div>`;
+    html += `<div class="code-line flex items-start gap-3 border-b border-border/40 px-3 py-1.5 last:border-b-0"><span class="line-number w-8 text-right text-[10px] text-muted-foreground">${i + 1}</span><span class="line-content flex-1 whitespace-pre-wrap">${escapeHtml(line) || ' '}</span></div>`;
   });
   html += '</div>';
   return html;
@@ -770,10 +780,19 @@ function appendMessage(message) {
   if (!contentHtml.trim()) return;
 
   const msgDiv = document.createElement('div');
-  msgDiv.className = `message message-${message.type}`;
+  const wrapperClass = [
+    'message',
+    `message-${message.type}`,
+    'rounded-2xl',
+    'border',
+    'p-4',
+    'space-y-3',
+    isUser ? 'border-accent/40 bg-accent/10' : 'border-border bg-card/60'
+  ].join(' ');
+  msgDiv.className = wrapperClass;
   msgDiv.innerHTML = `
-    <div class="message-label">${label}</div>
-    <div class="message-content">${contentHtml}</div>
+    <div class="message-label text-xs font-semibold uppercase tracking-wide text-muted-foreground">${label}</div>
+    <div class="message-content space-y-3">${contentHtml}</div>
   `;
 
   container.appendChild(msgDiv);
@@ -809,10 +828,10 @@ function handleRoute() {
 
 function showSessionNotFound(sessionId) {
   document.getElementById('messages').innerHTML = `
-    <div class="empty-state">
-      <div class="empty-state-icon">&#x26A0;</div>
-      <div class="empty-state-title">Session not found</div>
-      <div class="empty-state-text">The session "${escapeHtml(sessionId)}" could not be found.</div>
+    <div class="empty-state flex flex-col items-center justify-center rounded-2xl border border-border bg-card/60 px-6 py-12 text-center">
+      <div class="empty-state-icon text-3xl">&#x26A0;</div>
+      <div class="empty-state-title mt-4 text-lg font-semibold text-foreground">Session not found</div>
+      <div class="empty-state-text text-sm text-muted-foreground">The session "${escapeHtml(sessionId)}" could not be found.</div>
     </div>
   `;
   document.getElementById('detail-title').textContent = 'Session not found';
@@ -897,24 +916,24 @@ function renderSettingsDirectories() {
   const dirs = state.directories;
 
   if (dirs.length === 0) {
-    container.innerHTML = '<p style="color: var(--text-muted)">No directories configured.</p>';
+    container.innerHTML = '<p class="text-sm text-muted-foreground">No directories configured.</p>';
     return;
   }
 
   container.innerHTML = dirs.map(dir => `
-    <div class="settings-directory-item" data-path="${escapeHtml(dir.path)}">
-      <div class="settings-directory-color" style="background: ${dir.color}"></div>
-      <div class="settings-directory-info">
-        <div class="settings-directory-label">${escapeHtml(dir.label)}</div>
-        <div class="settings-directory-path">${escapeHtml(dir.path)}</div>
+    <div class="settings-directory-item flex flex-wrap items-center gap-3 rounded-xl border border-border bg-background/70 p-3" data-path="${escapeHtml(dir.path)}">
+      <div class="settings-directory-color h-3 w-3 rounded-full" style="background: ${dir.color}"></div>
+      <div class="settings-directory-info flex min-w-[200px] flex-1 flex-col">
+        <div class="settings-directory-label text-sm font-medium text-foreground">${escapeHtml(dir.label)}</div>
+        <div class="settings-directory-path text-xs text-muted-foreground">${escapeHtml(dir.path)}</div>
       </div>
       <label class="toggle">
         <input type="checkbox" ${dir.enabled !== false ? 'checked' : ''} onchange="toggleDirectoryEnabled('${escapeHtml(dir.path)}', this.checked)">
         <span class="slider"></span>
       </label>
-      <div class="settings-directory-actions">
-        <button class="btn-icon" onclick="editDirectory('${escapeHtml(dir.path)}')" title="Edit">&#x270F;</button>
-        <button class="btn-icon btn-danger" onclick="deleteDirectory('${escapeHtml(dir.path)}')" title="Delete">&#x1F5D1;</button>
+      <div class="settings-directory-actions flex items-center gap-2">
+        <button class="btn-icon inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background/80 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="editDirectory('${escapeHtml(dir.path)}')" title="Edit">&#x270F;</button>
+        <button class="btn-icon btn-danger inline-flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background/80 text-sm text-destructive transition-colors hover:bg-destructive/10" onclick="deleteDirectory('${escapeHtml(dir.path)}')" title="Delete">&#x1F5D1;</button>
       </div>
     </div>
   `).join('');
@@ -929,13 +948,13 @@ function showAddDirectoryForm() {
   }
 
   const formHtml = `
-    <div class="add-directory-form" id="add-directory-form">
-      <input type="text" id="new-dir-path" placeholder="Directory path (e.g., ~/.claude)" class="input">
-      <input type="text" id="new-dir-label" placeholder="Label (e.g., Work)" class="input">
-      <input type="color" id="new-dir-color" value="#10b981" class="input-color">
-      <div class="form-actions">
-        <button class="btn btn-primary" onclick="submitAddDirectory()">Add</button>
-        <button class="btn btn-secondary" onclick="cancelAddDirectory()">Cancel</button>
+    <div class="add-directory-form mt-4 space-y-3 rounded-xl border border-border bg-background/70 p-3" id="add-directory-form">
+      <input type="text" id="new-dir-path" placeholder="Directory path (e.g., ~/.claude)" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
+      <input type="text" id="new-dir-label" placeholder="Label (e.g., Work)" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
+      <input type="color" id="new-dir-color" value="#10b981" class="input-color h-9 w-16 rounded-md border border-border bg-background/80">
+      <div class="form-actions flex items-center justify-end gap-2">
+        <button class="btn btn-primary inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90" onclick="submitAddDirectory()">Add</button>
+        <button class="btn btn-secondary inline-flex items-center justify-center rounded-md border border-border bg-background/80 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="cancelAddDirectory()">Cancel</button>
       </div>
     </div>
   `;
@@ -1013,31 +1032,31 @@ function editDirectory(path) {
   if (existingModal) existingModal.remove();
 
   const modal = document.createElement('div');
-  modal.className = 'modal open';
+  modal.className = 'modal open fixed inset-0 z-50 flex items-center justify-center';
   modal.id = 'edit-directory-modal';
   modal.innerHTML = `
-    <div class="modal-backdrop" onclick="closeEditDirectory()"></div>
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Edit Directory</h2>
-        <button class="modal-close" onclick="closeEditDirectory()">&times;</button>
+    <div class="modal-backdrop absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeEditDirectory()"></div>
+    <div class="modal-content relative mx-auto w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-xl">
+      <div class="modal-header flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-foreground">Edit Directory</h2>
+        <button class="modal-close rounded-full border border-border bg-background/80 px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="closeEditDirectory()">&times;</button>
       </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Path</label>
-          <input type="text" id="edit-dir-path" value="${escapeHtml(dir.path)}" class="input" readonly style="opacity: 0.6">
+      <div class="modal-body mt-5 space-y-4">
+        <div class="form-group space-y-2">
+          <label class="text-sm font-medium text-muted-foreground">Path</label>
+          <input type="text" id="edit-dir-path" value="${escapeHtml(dir.path)}" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 opacity-70" readonly>
         </div>
-        <div class="form-group">
-          <label>Label</label>
-          <input type="text" id="edit-dir-label" value="${escapeHtml(dir.label)}" class="input">
+        <div class="form-group space-y-2">
+          <label class="text-sm font-medium text-muted-foreground">Label</label>
+          <input type="text" id="edit-dir-label" value="${escapeHtml(dir.label)}" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
         </div>
-        <div class="form-group">
-          <label>Color</label>
-          <input type="color" id="edit-dir-color" value="${dir.color}" class="input-color">
+        <div class="form-group space-y-2">
+          <label class="text-sm font-medium text-muted-foreground">Color</label>
+          <input type="color" id="edit-dir-color" value="${dir.color}" class="input-color h-9 w-16 rounded-md border border-border bg-background/80">
         </div>
-        <div class="form-actions" style="margin-top: 16px;">
-          <button class="btn btn-primary" onclick="submitEditDirectory('${escapeHtml(path)}')">Save</button>
-          <button class="btn btn-secondary" onclick="closeEditDirectory()">Cancel</button>
+        <div class="form-actions mt-4 flex items-center justify-end gap-2">
+          <button class="btn btn-primary inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90" onclick="submitEditDirectory('${escapeHtml(path)}')">Save</button>
+          <button class="btn btn-secondary inline-flex items-center justify-center rounded-md border border-border bg-background/80 px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="closeEditDirectory()">Cancel</button>
         </div>
       </div>
     </div>
@@ -1111,17 +1130,17 @@ function renderTagsSection(session) {
   const autoTags = session.tags.filter(t => autoTagsList.includes(t));
 
   return `
-    <div class="session-tags-section">
-      <div class="tags-header">
-        <span class="tags-label">Tags</span>
-        <button class="btn-small" onclick="showAddTagForm('${session.id}')">+ Add Tag</button>
+    <div class="session-tags-section space-y-3 rounded-2xl border border-border bg-card/60 p-4">
+      <div class="tags-header flex items-center justify-between">
+        <span class="tags-label text-sm font-semibold uppercase tracking-wide text-muted-foreground">Tags</span>
+        <button class="btn-small inline-flex items-center justify-center rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="showAddTagForm('${session.id}')">+ Add Tag</button>
       </div>
-      <div class="tags-list">
-        ${autoTags.map(t => `<span class="tag tag-${t}">${t}</span>`).join('')}
+      <div class="tags-list flex flex-wrap gap-2">
+        ${autoTags.map(t => `<span class="tag tag-${t} inline-flex items-center rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground">${t}</span>`).join('')}
         ${customTags.map(t => `
-          <span class="tag tag-custom">
+          <span class="tag tag-custom inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground">
             ${escapeHtml(t)}
-            <button class="tag-remove" onclick="event.stopPropagation(); removeTag('${session.id}', '${escapeHtml(t)}')">&times;</button>
+            <button class="tag-remove rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="event.stopPropagation(); removeTag('${session.id}', '${escapeHtml(t)}')">&times;</button>
           </span>
         `).join('')}
       </div>
@@ -1136,9 +1155,11 @@ function showAddTagForm(sessionId) {
 
   container.classList.remove('hidden');
   container.innerHTML = `
-    <input type="text" id="new-tag-input-${sessionId}" placeholder="Tag name" class="input-small" onkeypress="if(event.key==='Enter')submitAddTag('${sessionId}')">
-    <button class="btn-small btn-primary" onclick="submitAddTag('${sessionId}')">Add</button>
-    <button class="btn-small" onclick="hideAddTagForm('${sessionId}')">Cancel</button>
+    <div class="flex flex-wrap items-center gap-2">
+      <input type="text" id="new-tag-input-${sessionId}" placeholder="Tag name" class="input-small w-48 rounded-md border border-input bg-background/80 px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40" onkeypress="if(event.key==='Enter')submitAddTag('${sessionId}')">
+      <button class="btn-small btn-primary inline-flex items-center justify-center rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90" onclick="submitAddTag('${sessionId}')">Add</button>
+      <button class="btn-small inline-flex items-center justify-center rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="hideAddTagForm('${sessionId}')">Cancel</button>
+    </div>
   `;
   document.getElementById(`new-tag-input-${sessionId}`).focus();
 }
@@ -1212,10 +1233,15 @@ function showNotification(message, type = 'info') {
   if (existing) existing.remove();
 
   const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
+  const typeClass = type === 'error'
+    ? 'border-destructive/50 bg-destructive/10 text-destructive'
+    : type === 'success'
+      ? 'border-accent/50 bg-accent/10 text-foreground'
+      : 'border-border bg-card/80 text-foreground';
+  notification.className = `notification notification-${type} fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl border px-4 py-3 text-sm shadow-lg backdrop-blur ${typeClass}`;
   notification.innerHTML = `
     <span>${escapeHtml(message)}</span>
-    <button class="notification-close" onclick="this.parentElement.remove()">&times;</button>
+    <button class="notification-close ml-2 rounded-full border border-border bg-background/70 px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="this.parentElement.remove()">&times;</button>
   `;
   document.body.appendChild(notification);
 
@@ -1462,12 +1488,12 @@ function renderActiveFilters() {
   container.classList.remove('hidden');
   container.innerHTML = `
     ${chips.map(chip => `
-      <span class="filter-chip">
+      <span class="filter-chip inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-medium text-muted-foreground">
         ${escapeHtml(chip.label)}
-        <button onclick="${chip.action}">&times;</button>
+        <button class="rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="${chip.action}">&times;</button>
       </span>
     `).join('')}
-    <button class="btn-small" onclick="clearAllFilters()">Clear all</button>
+    <button class="btn-small inline-flex items-center justify-center rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="clearAllFilters()">Clear all</button>
   `;
 }
 
