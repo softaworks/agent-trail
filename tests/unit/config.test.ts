@@ -41,6 +41,10 @@ describe('config', () => {
     let config = await loadConfig();
     expect(config.directories).toHaveLength(2);
 
+    await expect(
+      addDirectory({ path: '/tmp/new', label: 'New', color: '#fff', enabled: true }),
+    ).rejects.toThrow();
+
     await updateDirectory('/tmp/new', { label: 'Updated' });
     config = await loadConfig();
     expect(config.directories.find((d) => d.path === '/tmp/new')?.label).toBe('Updated');
@@ -48,6 +52,8 @@ describe('config', () => {
     await removeDirectory('/tmp/new');
     config = await loadConfig();
     expect(config.directories.find((d) => d.path === '/tmp/new')).toBeUndefined();
+
+    await expect(updateDirectory('/tmp/missing', { label: 'Missing' })).rejects.toThrow();
   });
 
   it('adds and removes pins', async () => {

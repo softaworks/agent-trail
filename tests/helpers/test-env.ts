@@ -1,4 +1,4 @@
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { appendFile, mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { clearConfigCache } from '../../src/config';
@@ -55,4 +55,9 @@ export async function createTestSession(
   const lines = messages.map((m) => JSON.stringify(m)).join('\n');
   await writeFile(sessionFile, lines, 'utf-8');
   return sessionFile;
+}
+
+export async function appendToSession(sessionFile: string, message: unknown): Promise<void> {
+  const line = `\n${JSON.stringify(message)}`;
+  await appendFile(sessionFile, line, 'utf-8');
 }

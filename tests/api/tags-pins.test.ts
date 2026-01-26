@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'bun:test';
 import { createServer } from '../../src/server';
-import { cleanupTestEnvironment, createTestEnvironment, type TestEnvironment } from '../helpers/test-env';
+import { cleanupTestEnvironment, createTestEnvironment, createTestSession, type TestEnvironment } from '../helpers/test-env';
+import { simpleSessionMessages } from '../fixtures/messages';
 
 describe('tags and pins API', () => {
   const app = createServer();
@@ -8,6 +9,7 @@ describe('tags and pins API', () => {
 
   beforeAll(async () => {
     env = await createTestEnvironment();
+    await createTestSession(env.sessionsDir, 'project-a', 'session-1', simpleSessionMessages);
   });
 
   afterAll(async () => {
@@ -31,6 +33,22 @@ describe('tags and pins API', () => {
       }),
     );
     expect(res.status).toBe(400);
+  });
+
+  it('adds and removes custom tags', async () => {
+    const addRes = await app.handle(
+      new Request('http://localhost/api/sessions/session-1/tags', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags: ['important'] }),
+      }),
+    );
+    expect(addRes.status).toBe(200);
+
+    const removeRes = await app.handle(
+      new Request('http://localhost/api/sessions/session-1/tags/important', { method: 'DELETE' }),
+    );
+    expect(removeRes.status).toBe(200);
   });
 
   it('pins and unpins session', async () => {
