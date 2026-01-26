@@ -12,27 +12,32 @@
       theme: {
         extend: {
           colors: {
-            'at-bg': {
-              primary: '#0d1117',
-              secondary: '#161b22',
-              tertiary: '#21262d',
-              card: '#1c2128',
-            },
-            'at-border': '#30363d',
-            'at-text': {
-              primary: '#e6edf3',
-              secondary: '#8b949e',
-              muted: '#6e7681',
-            },
-            'at-accent': {
-              DEFAULT: '#10b981',
-              soft: 'rgba(16, 185, 129, 0.15)',
-            },
-            'at-user': {
-              DEFAULT: '#2563eb',
-              soft: 'rgba(37, 99, 235, 0.12)',
-            },
-          }
+            background: 'rgb(var(--background) / <alpha-value>)',
+            foreground: 'rgb(var(--foreground) / <alpha-value>)',
+            card: 'rgb(var(--card) / <alpha-value>)',
+            'card-foreground': 'rgb(var(--card-foreground) / <alpha-value>)',
+            muted: 'rgb(var(--muted) / <alpha-value>)',
+            'muted-foreground': 'rgb(var(--muted-foreground) / <alpha-value>)',
+            border: 'rgb(var(--border) / <alpha-value>)',
+            input: 'rgb(var(--input) / <alpha-value>)',
+            primary: 'rgb(var(--primary) / <alpha-value>)',
+            'primary-foreground': 'rgb(var(--primary-foreground) / <alpha-value>)',
+            accent: 'rgb(var(--accent) / <alpha-value>)',
+            'accent-foreground': 'rgb(var(--accent-foreground) / <alpha-value>)',
+            destructive: 'rgb(var(--destructive) / <alpha-value>)',
+            'destructive-foreground': 'rgb(var(--destructive-foreground) / <alpha-value>)',
+            ring: 'rgb(var(--ring) / <alpha-value>)',
+          },
+          fontFamily: {
+            display: ['"Fraunces"', 'Georgia', 'serif'],
+            body: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', '"SF Mono"', '"Fira Code"', 'Consolas', 'monospace'],
+          },
+          borderRadius: {
+            sm: '6px',
+            md: '10px',
+            lg: '14px',
+          },
         }
       }
     }

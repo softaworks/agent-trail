@@ -4,51 +4,52 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Forest Trail Color Palette */
-  --bg-primary: #1a1f16;
-  --bg-secondary: #232a1e;
-  --bg-tertiary: #2d3626;
-  --bg-card: #252d1f;
-  --border: #3d4a35;
-  --border-subtle: #333d2b;
+  /* Semantic tokens (Tailwind-compatible) */
+  --background: 26 31 22;
+  --foreground: 232 240 228;
+  --card: 37 45 31;
+  --card-foreground: 232 240 228;
+  --muted: 35 42 30;
+  --muted-foreground: 168 184 160;
+  --border: 61 74 53;
+  --input: 61 74 53;
+  --primary: 212 168 85;
+  --primary-foreground: 26 31 22;
+  --accent: 90 138 74;
+  --accent-foreground: 232 240 228;
+  --destructive: 196 90 74;
+  --destructive-foreground: 232 240 228;
+  --ring: 212 168 85;
 
-  /* Text Colors */
-  --text-primary: #e8f0e4;
-  --text-secondary: #a8b8a0;
-  --text-muted: #6b7a63;
-
-  /* Accent Colors */
-  --accent: #d4a855;
+  /* Forest Trail palette (legacy + effects) */
+  --bg-primary: rgb(var(--background));
+  --bg-secondary: 35 42 30;
+  --bg-tertiary: 45 54 38;
+  --bg-card: rgb(var(--card));
+  --border-subtle: 51 61 43;
+  --text-primary: rgb(var(--foreground));
+  --text-secondary: 168 184 160;
+  --text-muted: 107 122 99;
   --accent-soft: rgba(212, 168, 85, 0.15);
-  --accent-hover: #e0b966;
-
-  /* Forest Greens */
-  --forest-primary: #5a8a4a;
+  --accent-hover: 224 185 102;
+  --forest-primary: 90 138 74;
   --forest-soft: rgba(90, 138, 74, 0.15);
-  --forest-muted: #4a7a3a;
-
-  /* User Messages */
-  --user-accent: #6b9b5a;
+  --forest-muted: 74 122 58;
+  --user-accent: 107 155 90;
   --user-soft: rgba(107, 155, 90, 0.12);
-
-  /* Status Colors */
-  --success: #5a9a4a;
+  --success: 90 154 74;
   --success-soft: rgba(90, 154, 74, 0.15);
-  --error: #c45a4a;
+  --error: 196 90 74;
   --error-soft: rgba(196, 90, 74, 0.12);
-  --warning: #d4a855;
+  --warning: 212 168 85;
   --warning-soft: rgba(212, 168, 85, 0.15);
-
-  /* Code Colors */
-  --code-bg: #1e2419;
-  --code-border: #3d4a35;
-  --line-number: #6b7a63;
-
-  /* Diff Colors */
+  --code-bg: 30 36 25;
+  --code-border: 61 74 53;
+  --line-number: 107 122 99;
   --diff-add-bg: rgba(90, 154, 74, 0.12);
-  --diff-add-border: #5a9a4a;
+  --diff-add-border: 90 154 74;
   --diff-remove-bg: rgba(196, 90, 74, 0.1);
-  --diff-remove-border: #c45a4a;
+  --diff-remove-border: 196 90 74;
 
   /* Border Radius */
   --radius-sm: 6px;
@@ -73,8 +74,8 @@
 
 body {
   font-family: var(--font-body);
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
   line-height: 1.6;
   font-size: 14px;
 }
