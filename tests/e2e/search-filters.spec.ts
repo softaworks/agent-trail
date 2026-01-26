@@ -28,6 +28,20 @@ test.describe('Search and Filters', () => {
     await expect(todayFilter).toHaveClass(/active/);
   });
 
+  test('toggles filters drawer', async ({ page }) => {
+    await page.goto('/');
+    const toggle = page.locator('#filters-toggle');
+    const drawer = page.locator('#filters-drawer');
+    await expect(toggle).toBeVisible();
+    const wasOpen = await drawer.evaluate(el => el.classList.contains('open'));
+    await toggle.click();
+    if (wasOpen) {
+      await expect(drawer).not.toHaveClass(/open/);
+    } else {
+      await expect(drawer).toHaveClass(/open/);
+    }
+  });
+
   test('displays filter counts', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.session-card');

@@ -1,2 +1,2 @@
 {"type":"user","message":{"content":[{"type":"text","text":"Fix the bug in login"}]},"timestamp":"2026-01-26T12:00:00.000Z"}
-{"type":"assistant","message":{"content":[{"type":"text","text":"I'll take a look."}]},"timestamp":"2026-01-26T12:01:00.000Z"}
+{"type":"assistant","message":{"content":[{"type":"text","text":"I'll take a look."},{"type":"tool_use","name":"Bash","id":"tool-1","input":{"command":"echo \"hello\""}}]},"timestamp":"2026-01-26T12:01:00.000Z"}

@@ -113,6 +113,44 @@
     <main class="main">
       <!-- List View -->
       <div class="list-view" id="list-view">
+        <div class="list-controls">
+          <div class="controls-row">
+            <button class="filters-toggle" id="filters-toggle" title="Toggle filters">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M3 5.75A.75.75 0 013.75 5h12.5a.75.75 0 01.53 1.28L12 10.56V15a.75.75 0 01-1.07.67l-2-1A.75.75 0 018 14V10.56L3.22 6.28A.75.75 0 013 5.75z" clip-rule="evenodd"/>
+              </svg>
+              <span class="filters-toggle-label" id="filters-toggle-label">Filters</span>
+            </button>
+
+            <div class="group-toggle" id="group-toggle">
+              <button class="group-btn active" data-group="date">Date</button>
+              <button class="group-btn" data-group="project">Project</button>
+              <button class="group-btn" data-group="directory">Directory</button>
+            </div>
+          </div>
+
+          <div class="active-filters" id="active-filters"></div>
+
+          <div class="filters-drawer" id="filters-drawer">
+            <div class="filters-section">
+              <div class="filters-title">Tags</div>
+              <div class="tag-list" id="tag-list"></div>
+            </div>
+            <div class="filters-section">
+              <div class="filters-title">Directories</div>
+              <div class="directory-list" id="directory-list"></div>
+            </div>
+            <div class="filters-section">
+              <div class="filters-title">Projects</div>
+              <div class="project-search">
+                <input type="text" class="input input-compact" id="project-search-input" placeholder="Search projects...">
+              </div>
+              <div class="project-list" id="project-list"></div>
+              <button class="btn-small" id="project-browse-btn">Browse all</button>
+            </div>
+          </div>
+        </div>
+
         <div class="session-list" id="session-list">
           <div class="loading">
             <div class="loading-spinner"></div>
@@ -175,6 +213,24 @@
             <code id="config-path"></code>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects Modal -->
+  <div class="modal" id="projects-modal">
+    <div class="modal-backdrop" id="projects-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Projects</h2>
+        <button class="modal-close" id="projects-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Search</label>
+          <input type="text" class="input" id="projects-search-input" placeholder="Type to filter projects...">
+        </div>
+        <div class="projects-modal-list" id="projects-modal-list"></div>
       </div>
     </div>
   </div>

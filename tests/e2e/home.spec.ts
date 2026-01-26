@@ -18,6 +18,12 @@ test.describe('Home Page', () => {
     await expect(page.locator('#search-input')).toBeVisible();
   });
 
+  test('shows filters and grouping controls', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#filters-toggle')).toBeVisible();
+    await expect(page.locator('.group-btn[data-group="date"]')).toBeVisible();
+  });
+
   test('renders session cards', async ({ page }) => {
     await page.goto('/');
     await page.waitForSelector('.session-card');
