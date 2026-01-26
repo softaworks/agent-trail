@@ -104,6 +104,8 @@ In-app settings management:
 ~/.config/agenttrail/config.json
 ```
 
+You can override the config location by setting `AGENTTRAIL_CONFIG` to a custom path. This is useful for testing or running multiple isolated instances.
+
 ### Config Schema
 
 ```typescript
@@ -510,6 +512,9 @@ bun run build
 ### Testing
 
 ```bash
-# Run tests (future)
 bun test
+bun test tests/unit
+bun test tests/api
+bunx playwright install chromium
+bunx playwright test
 ```

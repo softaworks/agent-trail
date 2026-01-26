@@ -1,0 +1,15 @@
+{
+  "directories": [
+    {
+      "path": "tests/e2e/fixtures/sessions",
+      "label": "E2E",
+      "color": "#10b981",
+      "enabled": true
+    }
+  ],
+  "pins": [],
+  "customTags": {},
+  "server": {
+    "port": 9847
+  }
+}

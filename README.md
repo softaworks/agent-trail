@@ -83,6 +83,8 @@ bun run build
 
 `~/.config/agenttrail/config.json`
 
+You can override the config location by setting `AGENTTRAIL_CONFIG` to a custom path (useful for testing or isolated instances).
+
 On first run, if the config file does not exist, AgentTrail creates it and adds a default directory:
 `~/.claude/projects`.
 
@@ -137,6 +139,10 @@ bun run dev
 # typecheck
 bun run typecheck
 
+# tests
+bun test
+bunx playwright test
+
 # lint/format (Biome)
 bun run check
 bun run format
@@ -160,10 +166,7 @@ Contributions are welcome!
 
 ## Publishing
 
-This repository is set up to publish to npm via GitHub Actions using the same pattern as `datadog-cli`:
-
-- `.github/workflows/release-please.yml` opens a release PR (version bump + changelog) using conventional commits.
-- When a release is created (or via manual dispatch), it publishes to npm.
+This repository is set up to publish to npm via GitHub Actions using **semantic-release**.
 
 To enable publishing:
 

@@ -35,5 +35,11 @@ jobs:
       - name: Biome check
         run: bun run check
 
+      - name: Unit tests
+        run: bun test tests/unit
+
+      - name: API tests
+        run: bun test tests/api
+
       - name: Build
         run: bun run build

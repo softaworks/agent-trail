@@ -21,7 +21,7 @@ export interface AgentTrailConfig {
   };
 }
 
-const CONFIG_PATH = join(homedir(), '.config', 'agenttrail', 'config.json');
+const DEFAULT_CONFIG_PATH = join(homedir(), '.config', 'agenttrail', 'config.json');
 const DEFAULT_CLAUDE_DIR = join(homedir(), '.claude', 'projects');
 
 const DEFAULT_CONFIG: AgentTrailConfig = {
@@ -43,7 +43,7 @@ const DEFAULT_CONFIG: AgentTrailConfig = {
 let cachedConfig: AgentTrailConfig | null = null;
 
 export function getConfigPath(): string {
-  return CONFIG_PATH;
+  return process.env.AGENTTRAIL_CONFIG || DEFAULT_CONFIG_PATH;
 }
 
 export async function loadConfig(): Promise<AgentTrailConfig> {
@@ -51,14 +51,16 @@ export async function loadConfig(): Promise<AgentTrailConfig> {
     return cachedConfig;
   }
 
-  if (!existsSync(CONFIG_PATH)) {
+  const configPath = getConfigPath();
+
+  if (!existsSync(configPath)) {
     await initConfig();
     cachedConfig = { ...DEFAULT_CONFIG };
     return cachedConfig;
   }
 
   try {
-    const content = await readFile(CONFIG_PATH, 'utf-8');
+    const content = await readFile(configPath, 'utf-8');
     const config = JSON.parse(content) as AgentTrailConfig;
 
     // Merge with defaults to ensure all fields exist
@@ -80,24 +82,26 @@ export async function loadConfig(): Promise<AgentTrailConfig> {
 }
 
 export async function saveConfig(config: AgentTrailConfig): Promise<void> {
-  const configDir = dirname(CONFIG_PATH);
+  const configPath = getConfigPath();
+  const configDir = dirname(configPath);
 
   if (!existsSync(configDir)) {
     await mkdir(configDir, { recursive: true });
   }
 
-  await writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf-8');
+  await writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
   cachedConfig = config;
 }
 
 export async function initConfig(): Promise<void> {
-  const configDir = dirname(CONFIG_PATH);
+  const configPath = getConfigPath();
+  const configDir = dirname(configPath);
 
   if (!existsSync(configDir)) {
     await mkdir(configDir, { recursive: true });
   }
 
-  if (!existsSync(CONFIG_PATH)) {
+  if (!existsSync(configPath)) {
     await saveConfig(DEFAULT_CONFIG);
   }
 }
