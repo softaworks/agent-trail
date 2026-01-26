@@ -132,6 +132,10 @@ pre {
   display: block;
 }
 
+.thinking-block {
+  cursor: pointer;
+}
+
 /* Active states */
 .filter-btn.active,
 .group-btn.active,
