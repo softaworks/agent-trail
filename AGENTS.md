@@ -15,6 +15,6 @@ Local web viewer for Claude Code session history across multiple directories.
 
 ## Instructions (Progressive)
 
-- Architecture & data flow: `.claude/architecture.md`
-- Code style & conventions: `.claude/code-style.md`
-- Common workflows (features/bugfixes): `.claude/workflows.md`
+- Architecture & data flow: `docs/agent/architecture.md`
+- Code style & conventions: `docs/agent/code-style.md`
+- Common workflows (features/bugfixes): `docs/agent/workflows.md`
