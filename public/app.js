@@ -226,7 +226,7 @@ function renderSessionList() {
 function renderSection(title, sessions) {
   return `
     <div class="session-section space-y-3">
-      <div class="section-title text-xs font-semibold uppercase tracking-wide text-muted-foreground">${title}</div>
+      <div class="section-title text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">${title}</div>
       ${sessions.map(session => renderSessionCard(session)).join('')}
     </div>
   `;
@@ -237,9 +237,9 @@ function renderGroupedSessions(sessions) {
     const groups = groupSessionsByProject(sessions);
     return groups.map(group => `
       <div class="date-group space-y-3" data-group="${escapeHtml(group.key)}">
-        <div class="group-header flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+        <div class="group-header flex items-center gap-2 text-[13px] font-semibold text-muted-foreground">
           <span>${escapeHtml(group.label)}</span>
-          <span class="group-count ml-auto rounded-full border border-border bg-background/70 px-2 py-0.5 text-xs">${group.sessions.length}</span>
+          <span class="group-count ml-auto rounded-full border border-border bg-background/70 px-2 py-0.5 text-[11px]">${group.sessions.length}</span>
         </div>
         ${group.sessions.map(session => renderSessionCard(session)).join('')}
       </div>
@@ -250,10 +250,10 @@ function renderGroupedSessions(sessions) {
     const groups = groupSessionsByDirectory(sessions);
     return groups.map(group => `
       <div class="date-group space-y-3" data-group="${escapeHtml(group.key)}">
-        <div class="group-header flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+        <div class="group-header flex items-center gap-2 text-[13px] font-semibold text-muted-foreground">
           <span class="group-badge h-2.5 w-2.5 rounded-full" style="background: ${group.color}"></span>
           <span>${escapeHtml(group.label)}</span>
-          <span class="group-count ml-auto rounded-full border border-border bg-background/70 px-2 py-0.5 text-xs">${group.sessions.length}</span>
+          <span class="group-count ml-auto rounded-full border border-border bg-background/70 px-2 py-0.5 text-[11px]">${group.sessions.length}</span>
         </div>
         ${group.sessions.map(session => renderSessionCard(session)).join('')}
       </div>
@@ -268,7 +268,7 @@ function renderGroupedSessions(sessions) {
     if (groupSessions.length === 0) return '';
     return `
       <div class="date-group space-y-3" data-group="${groupKey}">
-        <div class="date-divider text-xs font-semibold uppercase tracking-wide text-muted-foreground">${getDateGroupLabel(groupKey)}</div>
+        <div class="date-divider text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">${getDateGroupLabel(groupKey)}</div>
         ${groupSessions.map(session => renderSessionCard(session)).join('')}
       </div>
     `;
@@ -286,15 +286,15 @@ function renderSessionCard(session) {
   return `
     <div class="session-card ${pinnedClass} ${awaitingClass} cursor-pointer rounded-2xl border border-border bg-card/60 p-4 transition hover:border-primary/40 hover:bg-card/80" data-id="${session.id}" onclick="showSession('${session.id}')">
       <div class="session-card-header flex items-start justify-between gap-4">
-        <div class="session-title text-base font-semibold text-foreground">${escapeHtml(session.title)}${pinBadge}</div>
-        <div class="session-project meta-link inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter-type="project" data-filter-value="${escapeHtml(session.project)}">
+        <div class="session-title text-[15px] font-semibold text-foreground">${escapeHtml(session.title)}${pinBadge}</div>
+        <div class="session-project meta-link inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter-type="project" data-filter-value="${escapeHtml(session.project)}">
           <span class="project-icon">&#x1F4C1;</span>
           ${escapeHtml(session.projectName)}
         </div>
       </div>
-      ${preview ? `<div class="session-preview mt-2 text-sm text-muted-foreground">${escapeHtml(preview)}</div>` : ''}
-      <div class="session-meta mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-        <span class="session-directory meta-link inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-medium" data-filter-type="directory" data-filter-value="${escapeHtml(session.directory)}" style="background: ${session.directoryColor}20; color: ${session.directoryColor}">
+      ${preview ? `<div class="session-preview mt-2 text-[13px] text-muted-foreground">${escapeHtml(preview)}</div>` : ''}
+      <div class="session-meta mt-3 flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+        <span class="session-directory meta-link inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] font-medium" data-filter-type="directory" data-filter-value="${escapeHtml(session.directory)}" style="background: ${session.directoryColor}20; color: ${session.directoryColor}">
           <span class="directory-color h-2 w-2 rounded-full" style="background: ${session.directoryColor}"></span>
           ${escapeHtml(session.directoryLabel)}
         </span>
@@ -304,7 +304,7 @@ function renderSessionCard(session) {
       </div>
       ${session.tags.length > 0 ? `
         <div class="session-tags mt-3 flex flex-wrap gap-2">
-          ${session.tags.map(tag => `<span class="tag tag-${tag} inline-flex items-center rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter-type="tag" data-filter-value="${escapeHtml(tag)}">${tag}</span>`).join('')}
+          ${session.tags.map(tag => `<span class="tag tag-${tag} inline-flex items-center rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter-type="tag" data-filter-value="${escapeHtml(tag)}">${tag}</span>`).join('')}
         </div>
       ` : ''}
     </div>
@@ -358,7 +358,7 @@ function renderDirectoryList() {
   const container = document.getElementById('directory-list');
   if (!container) return;
   container.innerHTML = state.directories.map(dir => `
-    <div class="directory-item ${state.filters.directory === dir.path ? 'active' : ''} inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+    <div class="directory-item ${state.filters.directory === dir.path ? 'active' : ''} inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
          data-path="${escapeHtml(dir.path)}" onclick="filterByDirectory('${escapeHtml(dir.path)}')">
       <span class="directory-color h-2 w-2 rounded-full" style="background: ${dir.color}"></span>
       <span class="directory-label">${escapeHtml(dir.label)}</span>
@@ -379,7 +379,7 @@ function renderProjectList() {
     : state.projects.slice().sort((a, b) => b.count - a.count).slice(0, 12);
 
   container.innerHTML = list.map(project => `
-    <div class="project-item ${state.filters.project === project.path ? 'active' : ''} inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+    <div class="project-item ${state.filters.project === project.path ? 'active' : ''} inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
          onclick="filterByProject('${escapeHtml(project.path)}')">
       <span class="project-icon">&#x1F4C1;</span>
       <span class="project-name">${escapeHtml(project.name)}</span>
@@ -394,7 +394,7 @@ function renderTagList() {
   container.innerHTML = Object.entries(state.tags)
     .sort((a, b) => b[1] - a[1])
     .map(([tag, count]) => `
-      <span class="tag tag-${tag} ${state.filters.tag === tag ? 'active' : ''} inline-flex items-center rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+      <span class="tag tag-${tag} ${state.filters.tag === tag ? 'active' : ''} inline-flex items-center rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
             onclick="filterByTag('${tag}')">${tag} (${count})</span>
     `).join('');
 }
@@ -580,7 +580,7 @@ function renderMessages(messages) {
 
       return `
         <div class="${wrapperClass}">
-          <div class="message-label text-xs font-semibold uppercase tracking-wide text-muted-foreground">${label}</div>
+          <div class="message-label text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">${label}</div>
           <div class="message-content space-y-3">${contentHtml}</div>
         </div>
       `;
@@ -791,7 +791,7 @@ function appendMessage(message) {
   ].join(' ');
   msgDiv.className = wrapperClass;
   msgDiv.innerHTML = `
-    <div class="message-label text-xs font-semibold uppercase tracking-wide text-muted-foreground">${label}</div>
+    <div class="message-label text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">${label}</div>
     <div class="message-content space-y-3">${contentHtml}</div>
   `;
 
@@ -924,8 +924,8 @@ function renderSettingsDirectories() {
     <div class="settings-directory-item flex flex-wrap items-center gap-3 rounded-xl border border-border bg-background/70 p-3" data-path="${escapeHtml(dir.path)}">
       <div class="settings-directory-color h-3 w-3 rounded-full" style="background: ${dir.color}"></div>
       <div class="settings-directory-info flex min-w-[200px] flex-1 flex-col">
-        <div class="settings-directory-label text-sm font-medium text-foreground">${escapeHtml(dir.label)}</div>
-        <div class="settings-directory-path text-xs text-muted-foreground">${escapeHtml(dir.path)}</div>
+        <div class="settings-directory-label text-[13px] font-medium text-foreground">${escapeHtml(dir.label)}</div>
+        <div class="settings-directory-path text-[11px] text-muted-foreground">${escapeHtml(dir.path)}</div>
       </div>
       <label class="toggle">
         <input type="checkbox" ${dir.enabled !== false ? 'checked' : ''} onchange="toggleDirectoryEnabled('${escapeHtml(dir.path)}', this.checked)">
@@ -1132,7 +1132,7 @@ function renderTagsSection(session) {
   return `
     <div class="session-tags-section space-y-3 rounded-2xl border border-border bg-card/60 p-4">
       <div class="tags-header flex items-center justify-between">
-        <span class="tags-label text-sm font-semibold uppercase tracking-wide text-muted-foreground">Tags</span>
+        <span class="tags-label text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Tags</span>
         <button class="btn-small inline-flex items-center justify-center rounded-full border border-border bg-background/70 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="showAddTagForm('${session.id}')">+ Add Tag</button>
       </div>
       <div class="tags-list flex flex-wrap gap-2">
