@@ -76,37 +76,8 @@
           <span class="logo-text">AgentTrail</span>
         </div>
 
-        <!-- Filter Buttons -->
-        <div class="filter-buttons flex items-center gap-1 rounded-full border border-border bg-card/70 p-1 text-sm" id="time-filters">
-          <button class="filter-btn active rounded-full px-3 py-1 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground" data-filter="all">
-            All
-            <span class="filter-count ml-1 rounded-full border border-border bg-background/70 px-2 py-0.5 text-[10px] text-muted-foreground" id="count-all">0</span>
-          </button>
-          <button class="filter-btn rounded-full px-3 py-1 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground" data-filter="today">
-            Today
-            <span class="filter-count ml-1 rounded-full border border-border bg-background/70 px-2 py-0.5 text-[10px] text-muted-foreground" id="count-today">0</span>
-          </button>
-          <button class="filter-btn rounded-full px-3 py-1 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground" data-filter="week">
-            Week
-            <span class="filter-count ml-1 rounded-full border border-border bg-background/70 px-2 py-0.5 text-[10px] text-muted-foreground" id="count-week">0</span>
-          </button>
-        </div>
-
-        <!-- Search -->
-        <div class="search-box">
-          <div class="search-wrapper flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1.5 text-sm">
-            <svg class="search-icon text-muted-foreground" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
-              <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/>
-            </svg>
-            <input type="text" class="search-input w-48 bg-transparent text-foreground outline-none placeholder:text-muted-foreground sm:w-64" id="search-input" placeholder="Search sessions...">
-            <button class="search-mode-btn rounded-full border border-border/70 bg-background/60 px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" id="search-mode-btn" title="Toggle deep search">
-              <span id="search-mode-label">Quick</span>
-            </button>
-          </div>
-        </div>
-
         <!-- Settings Button -->
-        <button class="settings-btn rounded-full border border-border bg-card/70 p-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" id="settings-btn" title="Settings">
+        <button class="settings-btn ml-auto rounded-full border border-border bg-card/70 p-2 text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" id="settings-btn" title="Settings">
           <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
             <path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
           </svg>
@@ -116,7 +87,7 @@
 
     <!-- Main Content -->
     <main class="main mx-auto flex w-full flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8">
-      <div class="content-grid grid w-full gap-4 md:grid-cols-[260px_minmax(0,1fr)] lg:grid-cols-[260px_minmax(0,1fr)_minmax(0,1fr)]">
+      <div class="content-grid grid w-full gap-4 md:grid-cols-[260px_minmax(0,1fr)]">
         <!-- Sidebar -->
         <aside class="sidebar space-y-4" id="sidebar">
           <div class="rounded-2xl border border-border bg-card/60 p-3 space-y-4">
@@ -131,6 +102,23 @@
             </div>
 
             <div class="filters-drawer grid gap-4" id="filters-drawer">
+              <div class="filters-section space-y-3">
+                <div class="filters-title text-xs font-semibold uppercase tracking-wide text-muted-foreground">Time</div>
+                <div class="space-y-2" id="time-filters">
+                  <button class="filter-btn active flex w-full items-center justify-between rounded-lg border border-border bg-background/70 px-3 py-2 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter="all">
+                    <span>All sessions</span>
+                    <span class="filter-count rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground" id="count-all">0</span>
+                  </button>
+                  <button class="filter-btn flex w-full items-center justify-between rounded-lg border border-border bg-background/70 px-3 py-2 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter="today">
+                    <span>Today</span>
+                    <span class="filter-count rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground" id="count-today">0</span>
+                  </button>
+                  <button class="filter-btn flex w-full items-center justify-between rounded-lg border border-border bg-background/70 px-3 py-2 text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-filter="week">
+                    <span>This week</span>
+                    <span class="filter-count rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground" id="count-week">0</span>
+                  </button>
+                </div>
+              </div>
               <div class="filters-section space-y-3">
                 <div class="filters-title text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tags</div>
                 <div class="tag-list flex flex-wrap gap-2" id="tag-list"></div>
@@ -154,6 +142,17 @@
         <section class="list-view" id="list-view">
           <div class="list-controls space-y-3">
             <div class="controls-row flex flex-wrap items-center justify-between gap-3">
+              <div class="search-box w-full">
+                <div class="search-wrapper flex items-center gap-2 rounded-lg border border-border bg-card/70 px-3 py-2 text-sm">
+                  <svg class="search-icon text-muted-foreground" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                    <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd"/>
+                  </svg>
+                  <input type="text" class="search-input w-full bg-transparent text-foreground outline-none placeholder:text-muted-foreground" id="search-input" placeholder="Search sessions...">
+                  <button class="search-mode-btn rounded-full border border-border/70 bg-background/60 px-2 py-0.5 text-xs text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" id="search-mode-btn" title="Toggle deep search">
+                    <span id="search-mode-label">Quick</span>
+                  </button>
+                </div>
+              </div>
               <div class="group-toggle inline-flex items-center gap-1 rounded-full border border-border bg-card/70 p-1" id="group-toggle">
                 <button class="group-btn active rounded-full px-3 py-1 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-group="date">Date</button>
                 <button class="group-btn rounded-full px-3 py-1 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" data-group="project">Project</button>

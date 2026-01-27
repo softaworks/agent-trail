@@ -29,14 +29,9 @@ function updateLayoutVisibility() {
   const listView = document.getElementById('list-view');
   const detailView = document.getElementById('detail-view');
   const sidebar = document.getElementById('sidebar');
-  const contentGrid = document.querySelector('.content-grid');
 
   if (sidebar) sidebar.classList.remove('hidden');
   if (detailView) detailView.classList.remove('hidden');
-
-  if (contentGrid) {
-    contentGrid.classList.toggle('expanded', Boolean(state.currentSession));
-  }
 
   if (state.currentSession) {
     if (listView) listView.classList.add('hidden');

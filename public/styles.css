@@ -396,13 +396,6 @@ pre {
   transform: translateY(8px);
 }
 
-/* Expanded detail pane */
-@media (min-width: 1024px) {
-  .content-grid.expanded {
-    grid-template-columns: 260px minmax(0, 1fr);
-  }
-}
-
 .detail-full {
   grid-column: 2 / -1;
 }
