@@ -31,15 +31,19 @@ function updateLayoutVisibility() {
   const sidebar = document.getElementById('sidebar');
 
   if (sidebar) sidebar.classList.remove('hidden');
-  if (detailView) detailView.classList.remove('hidden');
 
   if (state.currentSession) {
     if (listView) listView.classList.add('hidden');
-    if (detailView) detailView.classList.add('detail-full');
+    if (detailView) {
+      detailView.classList.remove('hidden');
+      detailView.classList.add('detail-full');
+    }
   } else {
     if (listView) listView.classList.remove('hidden');
-    if (detailView) detailView.classList.remove('detail-full');
-    renderDetailEmpty();
+    if (detailView) {
+      detailView.classList.add('hidden');
+      detailView.classList.remove('detail-full');
+    }
   }
 }
 
@@ -391,21 +395,58 @@ function renderProjectList() {
   const container = document.getElementById('project-list');
   if (!container) return;
   const query = (state.filters.projectQuery || '').toLowerCase().trim();
-  const list = query
-    ? state.projects.filter(project =>
-        project.name.toLowerCase().includes(query) ||
-        project.path.toLowerCase().includes(query)
-      )
-    : state.projects.slice().sort((a, b) => b.count - a.count).slice(0, 12);
+  const dirFilter = state.filters.directory;
 
-  container.innerHTML = list.map(project => `
-    <div class="project-item ${state.filters.project === project.path ? 'active' : ''} flex w-full items-center justify-between gap-3 rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
-         onclick="filterByProject('${escapeHtml(project.path)}')">
-      <span class="inline-flex items-center gap-2 truncate">
-        <span class="project-icon">&#x1F4C1;</span>
-        <span class="project-name truncate">${escapeHtml(project.name)}</span>
-      </span>
-      <span class="filter-count shrink-0 rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground">${project.count}</span>
+  let filtered = state.projects.slice();
+
+  // Filter by directory if one is selected
+  if (dirFilter) {
+    filtered = filtered.filter(project => project.directory === dirFilter);
+  }
+
+  // Filter by search query
+  if (query) {
+    filtered = filtered.filter(project =>
+      project.name.toLowerCase().includes(query) ||
+      project.path.toLowerCase().includes(query)
+    );
+  }
+
+  // Group projects by directory
+  const grouped = new Map();
+  filtered.forEach(project => {
+    const dirPath = project.directory;
+    if (!grouped.has(dirPath)) {
+      const dirInfo = state.directories.find(d => d.path === dirPath) || { label: dirPath, color: '#6b7280' };
+      grouped.set(dirPath, { ...dirInfo, projects: [] });
+    }
+    grouped.get(dirPath).projects.push(project);
+  });
+
+  // Sort groups by total count (descending), then sort projects within each group
+  const sortedGroups = Array.from(grouped.values())
+    .map(group => {
+      group.projects.sort((a, b) => b.count - a.count);
+      group.totalCount = group.projects.reduce((sum, p) => sum + p.count, 0);
+      return group;
+    })
+    .sort((a, b) => b.totalCount - a.totalCount);
+
+  container.innerHTML = sortedGroups.map(group => `
+    <div class="project-group mb-3">
+      <div class="project-group-header flex items-center gap-2 px-1 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+        <span class="h-2 w-2 rounded-full" style="background: ${group.color}"></span>
+        <span class="truncate">${escapeHtml(group.label)}</span>
+      </div>
+      <div class="project-group-items flex flex-col gap-1.5 pl-3">
+        ${group.projects.map(project => `
+          <div class="project-item ${state.filters.project === project.path ? 'active' : ''} flex w-full items-center justify-between gap-3 rounded-lg border border-border/70 bg-background/70 px-2.5 py-1.5 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+               onclick="filterByProject('${escapeHtml(project.path)}')">
+            <span class="project-name truncate">${escapeHtml(project.name)}</span>
+            <span class="filter-count shrink-0 rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground">${project.count}</span>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `).join('');
 }

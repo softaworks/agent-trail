@@ -86,11 +86,11 @@
     </header>
 
     <!-- Main Content -->
-    <main class="main mx-auto flex w-full flex-1 overflow-y-auto px-4 py-5 sm:px-6 lg:px-8">
-      <div class="content-grid grid w-full gap-4 md:grid-cols-[260px_minmax(0,1fr)]">
+    <main class="main mx-auto flex w-full flex-1 overflow-hidden px-4 py-5 sm:px-6 lg:px-8">
+      <div class="content-grid grid h-full w-full gap-4 md:grid-cols-[260px_minmax(0,1fr)]">
         <!-- Sidebar -->
-        <aside class="sidebar space-y-4" id="sidebar">
-          <div class="rounded-2xl border border-border bg-card/60 p-3 space-y-4">
+        <aside class="sidebar flex h-full flex-col" id="sidebar">
+          <div class="flex min-h-0 flex-1 flex-col rounded-2xl border border-border bg-card/60 p-3">
             <div class="flex items-center justify-between">
               <h2 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Filters</h2>
               <button class="filters-toggle inline-flex items-center gap-2 rounded-full border border-border bg-background/70 px-2.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" id="filters-toggle" title="Toggle filters">
@@ -101,7 +101,7 @@
               </button>
             </div>
 
-            <div class="filters-drawer grid gap-4" id="filters-drawer">
+            <div class="filters-drawer flex min-h-0 flex-1 flex-col gap-4 overflow-hidden" id="filters-drawer">
               <div class="filters-section space-y-3">
                 <div class="filters-title text-xs font-semibold uppercase tracking-wide text-muted-foreground">Time</div>
                 <div class="space-y-2" id="time-filters">
@@ -127,20 +127,20 @@
                 <div class="filters-title text-xs font-semibold uppercase tracking-wide text-muted-foreground">Directories</div>
                 <div class="directory-list flex flex-wrap gap-2" id="directory-list"></div>
               </div>
-              <div class="filters-section space-y-3">
+              <div class="filters-section flex min-h-0 flex-1 flex-col gap-3">
                 <div class="filters-title text-xs font-semibold uppercase tracking-wide text-muted-foreground">Projects</div>
-                <div class="project-search">
+                <div class="project-search shrink-0">
                   <input type="text" class="input input-compact w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40" id="project-search-input" placeholder="Search projects...">
                 </div>
-              <div class="project-list scrollable flex max-h-[420px] flex-col gap-2 overflow-auto pr-1" id="project-list"></div>
+                <div class="project-list scrollable flex min-h-0 flex-1 flex-col gap-2 overflow-auto pr-1" id="project-list"></div>
               </div>
             </div>
           </div>
         </aside>
 
         <!-- List View -->
-        <section class="list-view" id="list-view">
-          <div class="list-controls space-y-3">
+        <section class="list-view flex h-full flex-col overflow-hidden" id="list-view">
+          <div class="list-controls shrink-0 space-y-3">
             <div class="controls-row flex flex-wrap items-center justify-between gap-3">
               <div class="search-box w-full">
                 <div class="search-wrapper flex items-center gap-2 rounded-lg border border-border bg-card/70 px-3 py-2 text-sm">
@@ -163,7 +163,7 @@
             <div class="active-filters flex flex-wrap gap-2" id="active-filters"></div>
           </div>
 
-          <div class="session-list scrollable mt-4 space-y-3" id="session-list">
+          <div class="session-list scrollable mt-4 min-h-0 flex-1 space-y-3 overflow-auto" id="session-list">
             <div class="loading">
               <div class="loading-spinner"></div>
               Loading sessions...
@@ -172,8 +172,8 @@
         </section>
 
         <!-- Detail View -->
-        <section class="detail-view flex flex-col space-y-3" id="detail-view">
-          <div class="detail-header border-b border-border/70 pb-3">
+        <section class="detail-view hidden flex h-full flex-col space-y-3 overflow-hidden" id="detail-view">
+          <div class="detail-header shrink-0 border-b border-border/70 pb-3">
             <button class="back-button inline-flex items-center gap-2 rounded-full border border-border bg-card/70 px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" id="back-button">
               <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
                 <path fill-rule="evenodd" d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z" clip-rule="evenodd"/>
@@ -191,9 +191,9 @@
             <div class="detail-meta mt-2 flex flex-wrap gap-3 text-sm text-muted-foreground" id="detail-meta"></div>
           </div>
 
-          <div id="detail-banner"></div>
+          <div class="shrink-0" id="detail-banner"></div>
 
-          <div class="messages scrollable space-y-3" id="messages">
+          <div class="messages scrollable min-h-0 flex-1 space-y-3 overflow-auto" id="messages">
             <!-- Messages populated by JS -->
           </div>
         </section>

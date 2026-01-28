@@ -93,7 +93,7 @@ pre {
 }
 
 .filters-drawer.open {
-  display: grid;
+  display: flex;
 }
 
 .modal {
