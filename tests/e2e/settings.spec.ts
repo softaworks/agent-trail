@@ -3,14 +3,15 @@ import { expect, test } from '@playwright/test';
 
 const configPath = 'tests/e2e/fixtures/config.json';
 const baseConfig = {
-  directories: [
-    {
-      path: 'tests/e2e/fixtures/sessions',
-      label: 'E2E',
-      color: '#10b981',
-      enabled: true,
-    },
-  ],
+	  directories: [
+	    {
+	      path: 'tests/e2e/fixtures/sessions',
+	      label: 'E2E',
+	      color: '#10b981',
+	      enabled: true,
+	      type: 'claude',
+	    },
+	  ],
   pins: [],
   customTags: {},
   server: {
@@ -29,14 +30,14 @@ test.describe('Settings Modal', () => {
     await expect(page.locator('#settings-modal')).toHaveClass(/open/);
   });
 
-  test('shows directory list', async ({ page }) => {
+  test('shows profile list', async ({ page }) => {
     await page.goto('/');
     await page.locator('#settings-btn').click();
     const count = await page.locator('#settings-directories .settings-directory-item').count();
     expect(count).toBeGreaterThan(0);
   });
 
-  test('adds, edits, toggles, and deletes a directory', async ({ page }) => {
+  test('adds, edits, toggles, and deletes a profile', async ({ page }) => {
     await page.goto('/');
     await page.locator('#settings-btn').click();
 
@@ -53,7 +54,9 @@ test.describe('Settings Modal', () => {
     await expect(page.locator('#edit-directory-modal')).toBeVisible();
     await page.fill('#edit-dir-label', 'Extra Updated');
     await page.click('#edit-directory-modal .btn-primary');
-    await expect(page.locator(`${itemSelector} .settings-directory-label`)).toHaveText('Extra Updated');
+    await expect(
+      page.locator(`${itemSelector} .settings-directory-label > span`).first(),
+    ).toHaveText('Extra Updated');
 
     const toggle = page.locator(`${itemSelector} input[type="checkbox"]`);
     const slider = page.locator(`${itemSelector} .toggle .slider`);

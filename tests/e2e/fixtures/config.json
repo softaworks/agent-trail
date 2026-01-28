@@ -4,7 +4,8 @@
       "path": "tests/e2e/fixtures/sessions",
       "label": "E2E",
       "color": "#10b981",
-      "enabled": true
+      "enabled": true,
+      "type": "claude"
     }
   ],
   "pins": [],

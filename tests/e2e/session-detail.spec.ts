@@ -50,6 +50,13 @@ test.describe('Session Detail', () => {
     await page.locator('.session-card').first().click();
     await page.waitForSelector('.message');
 
+    // Allow the SSE connection to establish and deliver the initial status event.
+    await page.waitForFunction(() => {
+      // @ts-expect-error - global in app.js
+      return typeof state !== 'undefined' && state.eventSource?.readyState === 1;
+    });
+    await page.waitForTimeout(50);
+
     await page.evaluate(() => {
       // @ts-expect-error - global in app.js
       updateDetailLiveIndicator('working');
