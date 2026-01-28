@@ -1,6 +1,6 @@
 # AgentTrail
 
-Local (self-hosted) web viewer to browse **Claude Code** conversation history across **multiple directories**.
+Local (self-hosted) web viewer to browse **Claude Code** and **Codex CLI** conversation history across **multiple directories**.
 
 [![CI](https://github.com/softaworks/agenttrail/actions/workflows/checks.yml/badge.svg)](https://github.com/softaworks/agenttrail/actions/workflows/checks.yml)
 [![Coverage Status](https://coveralls.io/repos/github/softaworks/agenttrail/badge.svg?branch=main)](https://coveralls.io/github/softaworks/agenttrail?branch=main)
@@ -19,6 +19,7 @@ Many viewers assume a single session location (usually `~/.claude`). AgentTrail 
 - **Pins and custom tags** that persist across restarts
 - **Quick search** (client-side) and **deep search** (server-side, scans file content)
 - **Live updates** while `.jsonl` session files change
+- Support for **multiple session sources** (Claude + Codex) with per-directory configuration
 
 ## Requirements
 
@@ -89,6 +90,15 @@ You can override the config location by setting `AGENTTRAIL_CONFIG` to a custom 
 On first run, if the config file does not exist, AgentTrail creates it and adds a default directory:
 `~/.claude/projects`.
 
+### Directory types (Claude vs Codex)
+
+Each configured directory can declare a `type`:
+
+- `claude` (default): expects Claude Code session layout (example: `~/.claude/projects`)
+- `codex`: expects Codex CLI sessions (default path: `~/.codex/sessions`)
+
+You can set this in the UI (**Settings**) when adding/editing a directory, or directly in the JSON.
+
 ### Example
 
 ```json
@@ -98,7 +108,15 @@ On first run, if the config file does not exist, AgentTrail creates it and adds 
       "path": "/home/user/.claude/projects",
       "label": "Default",
       "color": "#7c3aed",
-      "enabled": true
+      "enabled": true,
+      "type": "claude"
+    },
+    {
+      "path": "/home/user/.codex/sessions",
+      "label": "Codex",
+      "color": "#10b981",
+      "enabled": true,
+      "type": "codex"
     }
   ],
   "pins": [],

@@ -1,7 +1,7 @@
 {
   "name": "@softaworks/agent-trail",
   "version": "1.0.0",
-  "description": "Multi-directory Claude Code session viewer with configurable directories and enhanced features",
+  "description": "Multi-directory Claude Code and Codex CLI session viewer with configurable directories and enhanced features",
   "type": "module",
   "bin": {
     "agenttrail": "./dist/cli.js"
@@ -28,6 +28,9 @@
   "keywords": [
     "claude",
     "claude-code",
+    "codex",
+    "codex-cli",
+    "openai",
     "conversation",
     "history",
     "viewer",
