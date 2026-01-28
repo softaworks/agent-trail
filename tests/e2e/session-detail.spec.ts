@@ -14,4 +14,11 @@ test.describe('Session Detail', () => {
     await page.locator('.session-card').first().click();
     await expect(page.locator('.message')).toHaveCount(2);
   });
+
+  test('prefixes bash commands with $', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.session-card');
+    await page.locator('.session-card').first().click();
+    await expect(page.locator('.bash-content code')).toContainText('$ echo "hello"');
+  });
 });

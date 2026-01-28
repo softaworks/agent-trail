@@ -23,8 +23,38 @@ test.describe('Search and Filters', () => {
 
   test('filters by time - Today', async ({ page }) => {
     await page.goto('/');
-    const todayFilter = page.locator('#time-filters .filter-item[data-filter="today"]');
+    const todayFilter = page.locator('.filter-btn[data-filter="today"]');
     await todayFilter.click();
     await expect(todayFilter).toHaveClass(/active/);
+  });
+
+  test('toggles filters drawer', async ({ page }) => {
+    await page.goto('/');
+    const toggle = page.locator('#filters-toggle');
+    const drawer = page.locator('#filters-drawer');
+    await expect(toggle).toBeVisible();
+    const wasOpen = await drawer.evaluate(el => el.classList.contains('open'));
+    await toggle.click();
+    if (wasOpen) {
+      await expect(drawer).not.toHaveClass(/open/);
+    } else {
+      await expect(drawer).toHaveClass(/open/);
+    }
+  });
+
+  test('displays filter counts', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('.session-card');
+
+    const allCount = page.locator('#count-all');
+    const todayCount = page.locator('#count-today');
+    const weekCount = page.locator('#count-week');
+
+    await expect(allCount).toBeVisible();
+    await expect(todayCount).toBeVisible();
+    await expect(weekCount).toBeVisible();
+
+    const allText = await allCount.textContent();
+    expect(Number(allText)).toBeGreaterThanOrEqual(0);
   });
 });
