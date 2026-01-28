@@ -2,8 +2,8 @@
 
 Local (self-hosted) web viewer to browse **Claude Code** and **Codex CLI** conversation history across **multiple profiles**.
 
-[![CI](https://github.com/softaworks/agenttrail/actions/workflows/checks.yml/badge.svg)](https://github.com/softaworks/agenttrail/actions/workflows/checks.yml)
-[![Coverage Status](https://coveralls.io/repos/github/softaworks/agenttrail/badge.svg?branch=main)](https://coveralls.io/github/softaworks/agenttrail?branch=main)
+[![CI](https://github.com/softaworks/agent-trail/actions/workflows/checks.yml/badge.svg)](https://github.com/softaworks/agent-trail/actions/workflows/checks.yml)
+[![Coverage Status](https://coveralls.io/repos/github/softaworks/agent-trail/badge.svg?branch=main)](https://coveralls.io/github/softaworks/agent-trail?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 AgentTrail scans configured folders (for example `~/.claude/projects` plus backups), lists sessions by project/profile, supports **quick/deep search**, **pinning**, **custom tags**, and live updates (SSE + file watch).

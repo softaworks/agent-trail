@@ -42,12 +42,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/softaworks/agenttrail.git"
+    "url": "https://github.com/softaworks/agent-trail.git"
   },
   "bugs": {
-    "url": "https://github.com/softaworks/agenttrail/issues"
+    "url": "https://github.com/softaworks/agent-trail/issues"
   },
-  "homepage": "https://github.com/softaworks/agenttrail#readme",
+  "homepage": "https://github.com/softaworks/agent-trail#readme",
   "author": "Softaworks",
   "license": "MIT",
   "publishConfig": {
