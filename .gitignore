@@ -6,6 +6,9 @@ dist/
 coverage/
 lcov.info
 
+# Test artifacts
+test-results/
+
 # OS files
 .DS_Store
 Thumbs.db
