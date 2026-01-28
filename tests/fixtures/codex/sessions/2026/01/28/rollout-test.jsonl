@@ -1,0 +1,5 @@
+{"timestamp":"2026-01-28T11:01:55.045Z","type":"session_meta","payload":{"id":"019c0444-test","timestamp":"2026-01-28T11:01:55.045Z","cwd":"/tmp/codex-project","originator":"codex_cli_rs","cli_version":"0.92.0","source":"cli","model_provider":"openai"}}
+{"timestamp":"2026-01-28T11:01:56.000Z","type":"event_msg","payload":{"type":"user_message","message":"hello from codex"}}
+{"timestamp":"2026-01-28T11:01:57.000Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"echo hi\"}","call_id":"call_1"}}
+{"timestamp":"2026-01-28T11:01:58.000Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call_1","output":"hi\\n"}}
+{"timestamp":"2026-01-28T11:01:59.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"done"}]}}

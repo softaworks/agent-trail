@@ -2,7 +2,10 @@
 
 import { watch } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
+import { parseCodexSessionFile } from './codex-parser';
+import { loadConfig } from './config';
 import { determineSessionStatus, type Message, parseSessionFile } from './parser';
+import { resolveUserPath } from './paths';
 
 export interface WatcherEvent {
   type: 'message' | 'status';
@@ -85,7 +88,7 @@ export class SessionWatcher {
       if (fileStat.size <= lastSize) return;
 
       const content = await readFile(filePath, 'utf-8');
-      const messages = parseSessionFile(content);
+      const messages = await parseWatchedFile(filePath, content);
 
       if (messages.length > 0) {
         const lastMessage = messages[messages.length - 1];
@@ -135,3 +138,31 @@ export class SessionWatcher {
 
 // Singleton instance
 export const sessionWatcher = new SessionWatcher();
+
+async function parseWatchedFile(filePath: string, content: string): Promise<Message[]> {
+  const config = await loadConfig();
+  const codexRoots = config.directories
+    .filter((d) => d.type === 'codex')
+    .map((d) => resolveUserPath(d.path).replace(/\/+$/, ''));
+
+  for (const root of codexRoots) {
+    if (filePath === root || filePath.startsWith(`${root}/`)) {
+      return parseCodexSessionFile(content);
+    }
+  }
+
+  // Fallback detection by first line
+  const firstLine = content.split('\n')[0];
+  if (firstLine) {
+    try {
+      const firstObj = JSON.parse(firstLine) as { type?: string };
+      if (firstObj?.type === 'session_meta') {
+        return parseCodexSessionFile(content);
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  return parseSessionFile(content);
+}

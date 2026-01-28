@@ -186,6 +186,7 @@ export function createServer() {
               label: t.String(),
               color: t.String(),
               enabled: t.Boolean(),
+              type: t.Optional(t.Union([t.Literal('claude'), t.Literal('codex')])),
             }),
           ),
           pins: t.Array(t.String()),
@@ -210,6 +211,7 @@ export function createServer() {
           label: t.String(),
           color: t.String(),
           enabled: t.Boolean(),
+          type: t.Optional(t.Union([t.Literal('claude'), t.Literal('codex')])),
         }),
       },
     )
@@ -236,6 +238,7 @@ export function createServer() {
             label: t.String(),
             color: t.String(),
             enabled: t.Boolean(),
+            type: t.Optional(t.Union([t.Literal('claude'), t.Literal('codex')])),
           }),
         ),
       },

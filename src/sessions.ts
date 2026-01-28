@@ -2,9 +2,11 @@
 
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { basename, join } from 'node:path';
+import { extractCodexSessionMeta, parseCodexSessionFile } from './codex-parser';
 import {
   type AgentTrailConfig,
   type DirectoryConfig,
+  type DirectoryType,
   getCustomTagsSync,
   isPinnedSync,
   loadConfig,
@@ -15,6 +17,7 @@ import {
   type Message,
   parseSessionFile,
 } from './parser';
+import { resolveUserPath } from './paths';
 import { generateTags } from './tagger';
 
 export interface Session {
@@ -32,6 +35,8 @@ export interface Session {
   status: 'awaiting' | 'working' | 'idle';
   filePath: string;
   isPinned: boolean;
+  source: DirectoryType;
+  assistantLabel: 'Claude' | 'Codex';
   chainId?: string;
   chainIndex?: number;
   chainLength?: number;
@@ -147,13 +152,24 @@ async function discoverSessionsInDirectory(
   dirConfig: DirectoryConfig,
   config: AgentTrailConfig,
 ): Promise<Session[]> {
+  if (dirConfig.type === 'codex') {
+    return discoverCodexSessionsInDirectory(dirConfig, config);
+  }
+  return discoverClaudeSessionsInDirectory(dirConfig, config);
+}
+
+async function discoverClaudeSessionsInDirectory(
+  dirConfig: DirectoryConfig,
+  config: AgentTrailConfig,
+): Promise<Session[]> {
   const sessions: Session[] = [];
 
   try {
-    const projectDirs = await readdir(dirConfig.path);
+    const rootPath = resolveUserPath(dirConfig.path);
+    const projectDirs = await readdir(rootPath);
 
     for (const projectDir of projectDirs) {
-      const projectPath = join(dirConfig.path, projectDir);
+      const projectPath = join(rootPath, projectDir);
       const projectStat = await stat(projectPath);
 
       if (!projectStat.isDirectory()) continue;
@@ -210,6 +226,8 @@ async function discoverSessionsInDirectory(
             status,
             filePath,
             isPinned: isPinnedSync(config, sessionId),
+            source: 'claude',
+            assistantLabel: 'Claude',
           });
         } catch {
           // Skip files that can't be parsed
@@ -218,6 +236,96 @@ async function discoverSessionsInDirectory(
     }
   } catch (error) {
     console.error(`Error discovering sessions in ${dirConfig.path}:`, error);
+  }
+
+  return sessions;
+}
+
+async function walkJsonlFiles(rootPath: string): Promise<string[]> {
+  const result: string[] = [];
+  const stack: string[] = [rootPath];
+
+  while (stack.length > 0) {
+    const dir = stack.pop();
+    if (!dir) continue;
+
+    let entries: Array<{ name: string; isDirectory: () => boolean; isFile: () => boolean }> = [];
+    try {
+      entries = await readdir(dir, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+
+    for (const entry of entries) {
+      const fullPath = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith('.jsonl')) {
+        result.push(fullPath);
+      }
+    }
+  }
+
+  return result;
+}
+
+async function discoverCodexSessionsInDirectory(
+  dirConfig: DirectoryConfig,
+  config: AgentTrailConfig,
+): Promise<Session[]> {
+  const sessions: Session[] = [];
+
+  const rootPath = resolveUserPath(dirConfig.path);
+  const jsonlFiles = await walkJsonlFiles(rootPath);
+
+  for (const filePath of jsonlFiles) {
+    try {
+      const fileStat = await stat(filePath);
+      const content = await readFile(filePath, 'utf-8');
+      const messages = parseCodexSessionFile(content);
+      if (messages.length === 0) continue;
+
+      const meta = extractCodexSessionMeta(content);
+      const lastModifiedStr = fileStat.mtime.toISOString();
+      const firstTimestamp = meta.startedAt || messages[0]?.timestamp || lastModifiedStr;
+
+      const rawId = basename(filePath, '.jsonl');
+      const sessionId = `codex:${rawId}`;
+
+      const project = meta.cwd || 'Unknown';
+      const projectName = meta.cwd
+        ? meta.cwd.split('/').filter(Boolean).slice(-1)[0] || meta.cwd
+        : 'Unknown';
+
+      const title = generateSessionSummary(messages);
+
+      const autoTags = generateTags(messages);
+      const customTags = getCustomTagsSync(config, sessionId);
+      const allTags = [...new Set([...autoTags, ...customTags])];
+
+      const status = determineSessionStatus(messages, lastModifiedStr);
+
+      sessions.push({
+        id: sessionId,
+        directory: dirConfig.path,
+        directoryLabel: dirConfig.label,
+        directoryColor: dirConfig.color,
+        project,
+        projectName,
+        title,
+        timestamp: firstTimestamp,
+        lastModified: lastModifiedStr,
+        messageCount: messages.length,
+        tags: allTags,
+        status,
+        filePath,
+        isPinned: isPinnedSync(config, sessionId),
+        source: 'codex',
+        assistantLabel: 'Codex',
+      });
+    } catch {
+      // Skip files that can't be parsed
+    }
   }
 
   return sessions;
@@ -246,7 +354,8 @@ export async function getSessionById(sessionId: string): Promise<SessionDetail |
 
   try {
     const content = await readFile(session.filePath, 'utf-8');
-    const messages = parseSessionFile(content);
+    const messages =
+      session.source === 'codex' ? parseCodexSessionFile(content) : parseSessionFile(content);
 
     return {
       ...session,
@@ -298,7 +407,14 @@ export async function getTagCounts(): Promise<Record<string, number>> {
 }
 
 export async function getDirectoryList(): Promise<
-  { path: string; label: string; color: string; count: number }[]
+  {
+    path: string;
+    label: string;
+    color: string;
+    count: number;
+    enabled: boolean;
+    type: DirectoryType;
+  }[]
 > {
   const config = await loadConfig();
   const sessions = await discoverSessions();
@@ -308,14 +424,14 @@ export async function getDirectoryList(): Promise<
     dirCounts.set(session.directory, (dirCounts.get(session.directory) || 0) + 1);
   }
 
-  return config.directories
-    .filter((d) => d.enabled)
-    .map((dir) => ({
-      path: dir.path,
-      label: dir.label,
-      color: dir.color,
-      count: dirCounts.get(dir.path) || 0,
-    }));
+  return config.directories.map((dir) => ({
+    path: dir.path,
+    label: dir.label,
+    color: dir.color,
+    count: dirCounts.get(dir.path) || 0,
+    enabled: dir.enabled !== false,
+    type: dir.type === 'codex' ? 'codex' : 'claude',
+  }));
 }
 
 export async function searchSessions(query: string, mode: 'quick' | 'deep'): Promise<Session[]> {

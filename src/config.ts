@@ -5,11 +5,14 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 
+export type DirectoryType = 'claude' | 'codex';
+
 export interface DirectoryConfig {
   path: string;
   label: string;
   color: string;
   enabled: boolean;
+  type?: DirectoryType;
 }
 
 export interface AgentTrailConfig {
@@ -31,6 +34,7 @@ const DEFAULT_CONFIG: AgentTrailConfig = {
       label: 'Default',
       color: '#7c3aed',
       enabled: true,
+      type: 'claude',
     },
   ],
   pins: [],
@@ -65,7 +69,10 @@ export async function loadConfig(): Promise<AgentTrailConfig> {
 
     // Merge with defaults to ensure all fields exist
     cachedConfig = {
-      directories: config.directories || DEFAULT_CONFIG.directories,
+      directories: (config.directories || DEFAULT_CONFIG.directories).map((dir) => ({
+        ...dir,
+        type: dir.type === 'codex' ? 'codex' : 'claude',
+      })),
       pins: config.pins || DEFAULT_CONFIG.pins,
       customTags: config.customTags || DEFAULT_CONFIG.customTags,
       server: {
@@ -181,7 +188,10 @@ export async function addDirectory(dir: DirectoryConfig): Promise<void> {
     throw new Error(`Directory already configured: ${dir.path}`);
   }
 
-  config.directories.push(dir);
+  config.directories.push({
+    ...dir,
+    type: dir.type === 'codex' ? 'codex' : 'claude',
+  });
   await saveConfig(config);
 }
 
@@ -196,7 +206,10 @@ export async function updateDirectory(
     throw new Error(`Directory not found: ${path}`);
   }
 
-  config.directories[index] = { ...config.directories[index], ...updates };
+  const normalizedUpdates: Partial<DirectoryConfig> = updates.type
+    ? { ...updates, type: updates.type === 'codex' ? 'codex' : 'claude' }
+    : updates;
+  config.directories[index] = { ...config.directories[index], ...normalizedUpdates };
   await saveConfig(config);
 }
 

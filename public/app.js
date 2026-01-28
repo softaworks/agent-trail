@@ -425,7 +425,8 @@ function renderStatusIndicator(status) {
 function renderDirectoryList() {
   const container = document.getElementById('directory-list');
   if (!container) return;
-  container.innerHTML = state.directories.map(dir => `
+  const enabledDirs = state.directories.filter(dir => dir.enabled !== false);
+  container.innerHTML = enabledDirs.map(dir => `
     <div class="directory-item ${state.filters.directory === dir.path ? 'active' : ''} inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
          data-path="${escapeHtml(dir.path)}" onclick="filterByDirectory('${escapeHtml(dir.path)}')">
       <span class="directory-color h-2 w-2 rounded-full" style="background: ${dir.color}"></span>
@@ -838,12 +839,13 @@ function renderDetailEmpty() {
 function renderMessages(messages) {
   const container = document.getElementById('messages');
   const toolResults = collectToolResults(messages);
+  const assistantLabel = state.currentSession?.assistantLabel || 'Claude';
 
   const html = messages
     .filter(msg => hasDisplayableContent(msg.content))
     .map(msg => {
       const isUser = msg.type === 'user';
-      const label = isUser ? 'You' : 'Claude';
+      const label = isUser ? 'You' : assistantLabel;
       const contentHtml = renderMessageContent(msg.content, toolResults);
       if (!contentHtml.trim()) return '';
 
@@ -1182,7 +1184,8 @@ function appendMessage(message) {
 
   const container = document.getElementById('messages');
   const isUser = message.type === 'user';
-  const label = isUser ? 'You' : 'Claude';
+  const assistantLabel = state.currentSession?.assistantLabel || 'Claude';
+  const label = isUser ? 'You' : assistantLabel;
   const contentHtml = renderMessageContent(message.content);
   if (!contentHtml.trim()) return;
 
@@ -1371,10 +1374,13 @@ function renderSettingsDirectories() {
   container.innerHTML = dirs.map(dir => `
     <div class="settings-directory-item flex flex-wrap items-center gap-3 rounded-xl border border-border bg-background/70 p-3" data-path="${escapeHtml(dir.path)}">
       <div class="settings-directory-color h-3 w-3 rounded-full" style="background: ${dir.color}"></div>
-      <div class="settings-directory-info flex min-w-[200px] flex-1 flex-col">
-        <div class="settings-directory-label text-[13px] font-medium text-foreground">${escapeHtml(dir.label)}</div>
-        <div class="settings-directory-path text-[11px] text-muted-foreground">${escapeHtml(dir.path)}</div>
-      </div>
+	      <div class="settings-directory-info flex min-w-[200px] flex-1 flex-col">
+	        <div class="settings-directory-label flex items-center gap-2 text-[13px] font-medium text-foreground">
+	          <span>${escapeHtml(dir.label)}</span>
+	          <span class="rounded-full border border-border bg-card/70 px-2 py-0.5 text-[10px] text-muted-foreground">${escapeHtml((dir.type || 'claude').toUpperCase())}</span>
+	        </div>
+	        <div class="settings-directory-path text-[11px] text-muted-foreground">${escapeHtml(dir.path)}</div>
+	      </div>
       <label class="toggle">
         <input type="checkbox" ${dir.enabled !== false ? 'checked' : ''} onchange="toggleDirectoryEnabled('${escapeHtml(dir.path)}', this.checked)">
         <span class="slider"></span>
@@ -1397,7 +1403,14 @@ function showAddDirectoryForm() {
 
   const formHtml = `
     <div class="add-directory-form mt-4 space-y-3 rounded-xl border border-border bg-background/70 p-3" id="add-directory-form">
-      <input type="text" id="new-dir-path" placeholder="Directory path (e.g., ~/.claude)" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
+      <div class="flex flex-wrap items-center gap-2">
+        <label class="text-xs font-medium text-muted-foreground">Type</label>
+        <select id="new-dir-type" class="rounded-md border border-border bg-background/80 px-3 py-2 text-sm text-foreground" onchange="updateAddDirectoryTypeHint()">
+          <option value="claude" selected>Claude</option>
+          <option value="codex">Codex</option>
+        </select>
+      </div>
+      <input type="text" id="new-dir-path" placeholder="Directory path (e.g., ~/.claude/projects)" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
       <input type="text" id="new-dir-label" placeholder="Label (e.g., Work)" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
       <input type="color" id="new-dir-color" value="#10b981" class="input-color h-9 w-16 rounded-md border border-border bg-background/80">
       <div class="form-actions flex items-center justify-end gap-2">
@@ -1407,7 +1420,19 @@ function showAddDirectoryForm() {
     </div>
   `;
   container.insertAdjacentHTML('beforeend', formHtml);
+  updateAddDirectoryTypeHint();
   document.getElementById('new-dir-path').focus();
+}
+
+function updateAddDirectoryTypeHint() {
+  const typeSelect = document.getElementById('new-dir-type');
+  const pathInput = document.getElementById('new-dir-path');
+  if (!typeSelect || !pathInput) return;
+  const type = typeSelect.value;
+  pathInput.placeholder =
+    type === 'codex'
+      ? 'Directory path (e.g., ~/.codex/sessions)'
+      : 'Directory path (e.g., ~/.claude/projects)';
 }
 
 function cancelAddDirectory() {
@@ -1419,10 +1444,12 @@ async function submitAddDirectory() {
   const pathInput = document.getElementById('new-dir-path');
   const labelInput = document.getElementById('new-dir-label');
   const colorInput = document.getElementById('new-dir-color');
+  const typeSelect = document.getElementById('new-dir-type');
 
   const path = pathInput.value.trim();
   const label = labelInput.value.trim() || path.split('/').pop();
   const color = colorInput.value;
+  const type = typeSelect?.value === 'codex' ? 'codex' : 'claude';
 
   if (!path) {
     showNotification('Please enter a directory path', 'error');
@@ -1433,7 +1460,7 @@ async function submitAddDirectory() {
     const res = await fetch('/api/directories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ path, label, color, enabled: true })
+      body: JSON.stringify({ path, label, color, enabled: true, type })
     });
 
     if (!res.ok) {
@@ -1490,14 +1517,21 @@ function editDirectory(path) {
         <button class="modal-close rounded-full border border-border bg-background/80 px-2.5 py-1 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground" onclick="closeEditDirectory()">&times;</button>
       </div>
       <div class="modal-body mt-5 space-y-4">
-        <div class="form-group space-y-2">
-          <label class="text-sm font-medium text-muted-foreground">Path</label>
-          <input type="text" id="edit-dir-path" value="${escapeHtml(dir.path)}" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 opacity-70" readonly>
-        </div>
-        <div class="form-group space-y-2">
-          <label class="text-sm font-medium text-muted-foreground">Label</label>
-          <input type="text" id="edit-dir-label" value="${escapeHtml(dir.label)}" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
-        </div>
+	        <div class="form-group space-y-2">
+	          <label class="text-sm font-medium text-muted-foreground">Path</label>
+	          <input type="text" id="edit-dir-path" value="${escapeHtml(dir.path)}" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 opacity-70" readonly>
+	        </div>
+	        <div class="form-group space-y-2">
+	          <label class="text-sm font-medium text-muted-foreground">Type</label>
+	          <select id="edit-dir-type" class="w-full rounded-md border border-border bg-background/80 px-3 py-2 text-sm text-foreground">
+	            <option value="claude" ${(dir.type || 'claude') === 'claude' ? 'selected' : ''}>Claude</option>
+	            <option value="codex" ${(dir.type || 'claude') === 'codex' ? 'selected' : ''}>Codex</option>
+	          </select>
+	        </div>
+	        <div class="form-group space-y-2">
+	          <label class="text-sm font-medium text-muted-foreground">Label</label>
+	          <input type="text" id="edit-dir-label" value="${escapeHtml(dir.label)}" class="input w-full rounded-md border border-input bg-background/80 px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40">
+	        </div>
         <div class="form-group space-y-2">
           <label class="text-sm font-medium text-muted-foreground">Color</label>
           <input type="color" id="edit-dir-color" value="${dir.color}" class="input-color h-9 w-16 rounded-md border border-border bg-background/80">
@@ -1520,6 +1554,7 @@ function closeEditDirectory() {
 async function submitEditDirectory(originalPath) {
   const label = document.getElementById('edit-dir-label').value.trim();
   const color = document.getElementById('edit-dir-color').value;
+  const type = document.getElementById('edit-dir-type')?.value === 'codex' ? 'codex' : 'claude';
 
   if (!label) {
     showNotification('Label cannot be empty', 'error');
@@ -1530,7 +1565,7 @@ async function submitEditDirectory(originalPath) {
     const res = await fetch(`/api/directories/${encodeURIComponent(originalPath)}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ label, color })
+      body: JSON.stringify({ label, color, type })
     });
 
     if (!res.ok) throw new Error('Failed to update directory');

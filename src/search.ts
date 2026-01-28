@@ -1,6 +1,7 @@
 // Search implementation for AgentTrail
 
 import { readFile } from 'node:fs/promises';
+import { parseCodexSessionFile } from './codex-parser';
 import { discoverSessions, type Session } from './sessions';
 
 export type SearchMode = 'quick' | 'deep';
@@ -48,8 +49,27 @@ export async function deepSearch(query: string): Promise<Session[]> {
     // Then search message content
     try {
       const content = await readFile(session.filePath, 'utf-8');
-      if (content.toLowerCase().includes(lowerQuery)) {
-        results.push(session);
+      if (session.source === 'codex') {
+        const messages = parseCodexSessionFile(content);
+        const haystack = messages
+          .flatMap((m) => m.content)
+          .map((block) => {
+            if (block.type === 'text') return block.text || '';
+            if (block.type === 'tool_use') return JSON.stringify(block.input ?? {});
+            if (block.type === 'tool_result') {
+              return typeof block.content === 'string'
+                ? block.content
+                : JSON.stringify(block.content ?? '');
+            }
+            return '';
+          })
+          .join('\n')
+          .toLowerCase();
+        if (haystack.includes(lowerQuery)) results.push(session);
+      } else {
+        if (content.toLowerCase().includes(lowerQuery)) {
+          results.push(session);
+        }
       }
     } catch {
       // Skip files that can't be read
