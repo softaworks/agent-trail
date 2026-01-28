@@ -1,6 +1,6 @@
 # AgentTrail
 
-Local web viewer for Claude Code and Codex CLI session history across multiple directories.
+Local web viewer for Claude Code and Codex CLI session history across multiple profiles.
 
 ## Quick Reference
 

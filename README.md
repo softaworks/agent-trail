@@ -1,12 +1,12 @@
 # AgentTrail
 
-Local (self-hosted) web viewer to browse **Claude Code** and **Codex CLI** conversation history across **multiple directories**.
+Local (self-hosted) web viewer to browse **Claude Code** and **Codex CLI** conversation history across **multiple profiles**.
 
 [![CI](https://github.com/softaworks/agenttrail/actions/workflows/checks.yml/badge.svg)](https://github.com/softaworks/agenttrail/actions/workflows/checks.yml)
 [![Coverage Status](https://coveralls.io/repos/github/softaworks/agenttrail/badge.svg?branch=main)](https://coveralls.io/github/softaworks/agenttrail?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-AgentTrail scans configured folders (for example `~/.claude/projects` plus backups), lists sessions by project/directory, supports **quick/deep search**, **pinning**, **custom tags**, and live updates (SSE + file watch).
+AgentTrail scans configured folders (for example `~/.claude/projects` plus backups), lists sessions by project/profile, supports **quick/deep search**, **pinning**, **custom tags**, and live updates (SSE + file watch).
 
 For the full specification (features, endpoints, UI), see `SPEC.md`.
 
@@ -14,12 +14,12 @@ For the full specification (features, endpoints, UI), see `SPEC.md`.
 
 Many viewers assume a single session location (usually `~/.claude`). AgentTrail adds:
 
-- **Multi-directory** support via persistent config (`~/.config/agenttrail/config.json`)
-- **Directory-isolated chaining** (sessions only chain within the same directory)
+- **Multi-profile** support via persistent config (`~/.config/agenttrail/config.json`)
+- **Profile-isolated chaining** (sessions only chain within the same profile)
 - **Pins and custom tags** that persist across restarts
 - **Quick search** (client-side) and **deep search** (server-side, scans file content)
 - **Live updates** while `.jsonl` session files change
-- Support for **multiple session sources** (Claude + Codex) with per-directory configuration
+- Support for **multiple session sources** (Claude + Codex) with per-profile configuration
 
 ## Requirements
 
@@ -87,17 +87,17 @@ bun run build
 
 You can override the config location by setting `AGENTTRAIL_CONFIG` to a custom path (useful for testing or isolated instances).
 
-On first run, if the config file does not exist, AgentTrail creates it and adds a default directory:
+On first run, if the config file does not exist, AgentTrail creates it and adds a default profile:
 `~/.claude/projects`.
 
-### Directory types (Claude vs Codex)
+### Profile types (Claude vs Codex)
 
-Each configured directory can declare a `type`:
+Each configured profile can declare a `type`:
 
 - `claude` (default): expects Claude Code session layout (example: `~/.claude/projects`)
 - `codex`: expects Codex CLI sessions (default path: `~/.codex/sessions`)
 
-You can set this in the UI (**Settings**) when adding/editing a directory, or directly in the JSON.
+You can set this in the UI (**Settings**) when adding/editing a profile, or directly in the JSON.
 
 ### Example
 
@@ -145,7 +145,7 @@ AgentTrail reads session files from your local disk and serves a local UI/API. I
 
 ## Notes / gotchas
 
-- Configure directories at the “projects” level (or equivalent): it expects project subfolders containing `.jsonl` files.
+- Configure profiles at the “projects” level (or equivalent): it expects project subfolders containing `.jsonl` files.
 - Sidechain sessions and `summary` lines are ignored (focus is the main conversation).
 - Deep search can be slower on large histories because it reads file contents.
 

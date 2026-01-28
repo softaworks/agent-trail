@@ -20,7 +20,7 @@ AgentTrail is a Bun + TypeScript project that serves:
 
 ## Key Concepts
 
-- **Directories:** user-configured roots where Claude Code stores projects/sessions.
+- **Profiles:** user-configured roots where Claude Code / Codex CLI store projects/sessions.
 - **Session:** a `.jsonl` file; parsed and normalized by `src/parser.ts`.
 - **Chain:** sessions grouped by `directory + project + normalized title` (directory-isolated).
 - **Tags:**
